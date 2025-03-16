@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Interactive CV"
+    />
+    <title>Loading CV…</title>
+
+    <!-- External resources – for offline usage you can download these locally -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- We no longer use CryptoJS for encryption; instead we rely on the browser's Web Crypto API -->
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+      /* ==========================================================================
+       Base Colors, Layout, and Component Styles
+       ========================================================================== */
+      :root {
+        --color-bg: #ffffff;
+        --color-bg-hover: #f8f9fa;
+        --color-text: #212529;
+        --color-highlight: #9a9ff7;
+        --color-muted: #6c757d;
+        /* Fallback colors */
+        --default-devops: #b3cde0;
+        --default-linux: #ccebc5;
+        --default-rettung: #fbb4ae;
+        --default-realschule: #ebd9f4;
+        --default-grundschule: #f4e8d9;
+        --color-skill-bubble: #d0d9e2;
+        /* High Contrast Defaults */
+        --hc-bg: #000;
+        --hc-text: #fff;
+        --hc-border: #fff;
+        --hc-toast-bg: #ff0;
+        --hc-toast-text: #000;
+        --hc-highlight: #ff0;
+        --hc-timeline-fill: #00ffff;
+        --hc-position-outline: #ffff00;
+      }
+      body {
+        margin: 0;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: "Helvetica Neue", Arial, sans-serif;
+      }
+
+      /* High Contrast Mode */
+      body.high-contrast {
+        font-size: 1.3rem !important;
+        background-color: var(--hc-bg) !important;
+        color: var(--hc-text) !important;
+      }
+      body.high-contrast #phone-link,
+      body.high-contrast #email-link {
+        font-size: 1.2rem !important;
+      }
+      body.high-contrast h5 {
+        font-size: 1.9rem !important;
+      }
+      body.high-contrast h6,
+      body.high-contrast h7 {
+        font-size: 1.5rem !important;
+      }
+      body.high-contrast .btn,
+      body.high-contrast .btn:hover {
+        border-color: var(--hc-border) !important;
+        color: var(--hc-text) !important;
+        background: none !important;
+        min-width: fit-content;
+      }
+      body.high-contrast .card,
+      body.high-contrast .list-group-item {
+        background: var(--hc-bg) !important;
+        color: var(--hc-text) !important;
+        border-color: var(--hc-border) !important;
+      }
+      body.high-contrast .position-card {
+        border-left-color: var(--hc-position-outline);
+      }
+      body.high-contrast #timeline-svg-container {
+        background: var(--hc-bg) !important;
+        height: 15vh !important;
+      }
+      body.high-contrast #timeline-svg {
+        background: var(--hc-bg) !important;
+      }
+      body.high-contrast #timeline-svg .tick {
+        font-size: 2.5vw !important;
+      }
+      body.high-contrast .timeline-rect {
+        fill: var(--hc-timeline-fill);
+      }
+      body.high-contrast #skill-tree-container {
+        height: auto !important;
+      }
+      body.high-contrast .skill-bubble {
+        /*outline: 4px dashed var(--hc-border) !important;*/
+        border: none !important;
+        background-color: var(--hc-skill-bg) !important;
+        color: var(--hc-text) !important;
+        position: sticky !important;
+        margin: 6px !important;
+        float: left !important;
+        left: 0px !important;
+        top: 0px !important;
+        width: max-content !important;
+      }
+      body.high-contrast #clipboard-toast {
+        outline: 4px solid var(--hc-highlight) !important;
+        background-color: var(--hc-toast-bg) !important;
+        color: var(--hc-toast-text) !important;
+        font-size: 1.3rem !important;
+        font-weight: 600 !important;
+      }
+      body.high-contrast #clipboard-toast .btn-close {
+        background-color: var(--hc-toast-bg) !important;
+      }
+      body.high-contrast .accomplishment-item.hovered,
+      body.high-contrast .skill-bubble.hovered,
+      body.high-contrast .position-card.hovered {
+        outline: 4px dashed var(--hc-highlight) !important;
+      }
+      body.high-contrast .position-card .text-muted,
+      body.high-contrast #skill-tree-legend {
+        color: var(--hc-text) !important;
+      }
+      body.high-contrast .highlighted {
+        background-color: var(--hc-highlight-bg) !important;
+        /* color: var(--hc-highlight) !important; */
+      }
+      body.high-contrast .copyable.btn:hover {
+        background-color: var(--hc-highlight-bg) !important;
+        color: var(--hc-highlight) !important;
+        border-radius: 4px !important;
+      }
+      body.high-contrast .clipboard-btn {
+        font-size: 1.5rem !important;
+        color: var(--hc-highlight) !important;
+        border-radius: 50%;
+        outline: 2px solid var(--hc-border) !important;
+      }
+
+      .top-buttons {
+        text-align: right;
+        margin: 1rem;
+      }
+      .top-buttons button {
+        margin-left: 0.5rem;
+        transition: transform 0.1s;
+      }
+
+      /* New style for passphrase input group */
+      #passphrase-container {
+        width: auto;
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 1rem;
+      }
+
+      .passphrase-input {
+        max-width: 300px;
+        min-width: 150px !important;
+        float: left;
+      }
+
+      #toggle-passphrase,
+      #passphrase-submit {
+        float: left;
+      }
+
+      /* Toast Notification */
+      #clipboard-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        display: none;
+      }
+
+      /* Sidebar & Sticky Elements */
+      aside {
+        top: 0;
+        z-index: 100;
+      }
+
+      @media (min-width: 768px) {
+        aside {
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+      }
+      @media (max-width: 767px) {
+        aside {
+          position: static; /* or relative, depending on your layout */
+        }
+      }
+
+      .portrait {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: var(--color-bg);
+        margin: 0 auto 1rem auto;
+      }
+      .copyable.btn {
+        cursor: pointer;
+        position: relative;
+        text-decoration: none;
+        color: inherit;
+      }
+      .clipboard-btn {
+        font-size: 1rem;
+        cursor: pointer;
+        margin-left: 0.25rem;
+        color: var(--color-muted);
+        transition: transform 0.1s;
+        padding: 4px;
+      }
+      .tooltip-custom {
+        position: absolute;
+        background: var(--color-highlight);
+        color: #fff;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 100;
+      }
+      #phone-link,
+      #email-link {
+        max-width: 65%;
+        word-break: break-all;
+      }
+
+      /* Position Cards */
+      .position-card {
+        border-left: 6px solid #ccc;
+        margin-bottom: 1rem;
+        transition: background-color 0.2s;
+      }
+      .position-card:hover {
+        background-color: var(--color-bg-hover);
+      }
+      .list-group-item {
+        background-color: unset !important;
+      }
+
+      .dimmed {
+        opacity: 0.4 !important;
+      }
+      .highlighted {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+      }
+
+      #cv-timestamp {
+        z-index: 100;
+        position: relative;
+      }
+
+      /* Skill Tree */
+      #skill-tree-container {
+        position: relative;
+        height: 400px;
+      }
+      #skill-tree-legend {
+        float: left;
+        width: 100%;
+      }
+      .skill-bubble {
+        position: absolute;
+        border-radius: 16px;
+        padding: 4px 8px;
+        /* background-color: var(--color-skill-bubble);*/
+        color: #000;
+        cursor: pointer;
+        text-align: center;
+        transition: opacity 0.2s, transform 0.2s;
+        user-select: none;
+        font-size: 14px;
+      }
+      .skill-bubble.hovered {
+        outline: 2px solid var(--color-highlight);
+        z-index: 10;
+      }
+      .skill-bubble.selected {
+        border: 2px solid var(--color-highlight);
+        background-color: var(--color-highlight);
+        color: #fff;
+        z-index: 120;
+      }
+
+      /* Timeline */
+      img,
+      svg {
+        overflow: visible !important;
+      }
+      #timeline-svg-container {
+        width: 100%;
+        height: 10vh;
+        position: sticky;
+        top: 0;
+        z-index: 90;
+        margin-top: 10vh;
+        /*box-shadow: 0 4px 4px -2px rgba(0,0,0,0.3);
+      background: var(--color-bg);*/
+        overflow: show;
+      }
+      #timeline-svg {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        top: -20px;
+        overflow-y: visible;
+      }
+      .timeline-rect {
+        cursor: pointer;
+        transition: opacity 0.2s, transform 0.2s;
+        fill-opacity: 0.8;
+      }
+      .timeline-rect:hover {
+        fill-opacity: 1;
+      }
+
+      /* Accomplishments */
+      .accomplishment-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        background: none;
+        border: none;
+        transition: background-color 0.2s;
+      }
+      .accomplishment-item:hover {
+        background-color: var(--color-hover);
+      }
+      .accomplishment-item.hovered {
+        background-color: var(--color-hover);
+      }
+      .clipboard-icon {
+        visibility: hidden;
+        color: var(--color-muted);
+        font-size: 1rem;
+        margin-left: 0.5rem;
+        transition: transform 0.1s;
+      }
+      .accomplishment-item:hover .clipboard-icon {
+        visibility: visible;
+      }
+      .accomplishment-item:active .clipboard-icon {
+        transform: scale(0.95);
+      }
+
+      /* Print Styles */
+      @media print {
+        body {
+          font-size: 11pt;
+          margin: 0.5cm;
+        }
+        .top-buttons,
+        #clipboard-toast,
+        .bi.btn,
+        .accomplishment-item > .btn,
+        .clipboard-btn {
+          display: none !important;
+        }
+        .container {
+          width: 210mm;
+          overflow: visible !important;
+        }
+        /* Force a desktop layout (side-by-side) */
+        .row {
+          display: flex !important;
+          flex-direction: row !important;
+        }
+        aside,
+        main {
+          width: 50% !important;
+        }
+        /* For print, force the skill tree into a flex layout so skills appear side by side */
+        #skill-tree-container {
+          display: flex !important;
+          flex-wrap: wrap !important;
+          align-items: center;
+          justify-content: flex-start;
+          height: auto !important;
+          border: none;
+        }
+        .skill-bubble {
+          margin: 2px;
+          position: static !important;
+          transform: none !important;
+          outline: none !important;
+        }
+        /* Timeline SVG: scale to fit DIN A4 width */
+        #timeline-svg-container {
+          display: none !important;
+        }
+        /* Remove extra margins */
+        .container,
+        .row,
+        aside,
+        main {
+          margin: 0;
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Buttons (including the new passphrase input group) -->
+    <div class="top-buttons">
+      <button
+        id="lang-toggle"
+        class="btn btn-outline-primary"
+        onclick="toggleLanguage()"
+      >
+        Switch to German
+      </button>
+      <button
+        id="contrast-toggle"
+        class="btn btn-outline-primary"
+        onclick="toggleContrast()"
+      >
+        Toggle Accessibility
+      </button>
+      <button
+        id="print-btn"
+        class="btn btn-outline-primary"
+        onclick="window.print()"
+      >
+        Print
+      </button>
+      <!-- Passphrase Unlock UI -->
+      <div id="passphrase-container" class="input-group">
+        <input
+          type="password"
+          id="passphrase-input"
+          class="form-control passphrase-input"
+          placeholder="Enter passphrase"
+        />
+        <button
+          id="toggle-passphrase"
+          class="btn btn-outline-secondary"
+          type="button"
+        >
+          <i class="bi bi-eye"></i>
+        </button>
+        <button id="passphrase-submit" class="btn btn-primary" type="button">
+          Unlock
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div
+      id="clipboard-toast"
+      class="toast align-items-center text-bg-success border-0"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <div class="d-flex">
+        <div class="toast-body" id="clipboard-toast-text">
+          Copied to clipboard
+        </div>
+        <button
+          type="button"
+          class="btn-close btn-close-white me-2 m-auto"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+      <div id="cv-timestamp" class="text-end small mb-2"></div>
+      <div class="row g-3">
+        <!-- LEFT SIDEBAR: Personal Info, Skill Tree, Certificates -->
+        <aside class="col-md-4">
+          <!-- Personal Info Card -->
+          <div class="card mb-3">
+            <div class="card-body text-center">
+              <div class="portrait">
+                <img
+                  id="portrait-image"
+                  alt="Portrait Picture"
+                  style="width: 100%; height: 100%"
+                />
+              </div>
+              <h2 class="card-title h4">
+                <span class="copyable" data-copy="" data-i18n="name"></span>
+                <i class="bi bi-clipboard clipboard-btn"></i>
+              </h2>
+              <p class="card-text" data-i18n="title"></p>
+              <p>
+                <i class="bi bi-geo-alt"></i>
+                <span data-i18n="birthplace"></span>
+              </p>
+              <p>
+                <i class="bi bi-calendar-event"></i>
+                <span data-i18n="dob"></span>
+              </p>
+              <p>
+                <i class="bi bi-telephone"></i>
+                <a
+                  href="#"
+                  id="phone-link"
+                  class="copyable btn btn-light btn-sm"
+                  data-copy=""
+                  data-i18n="phone"></a
+                >
+                <i class="bi bi-clipboard clipboard-btn"></i>
+              </p>
+              <p>
+                <i class="bi bi-envelope"></i>
+                <a
+                  href="#"
+                  id="email-link"
+                  class="copyable btn btn-light btn-sm"
+                  data-copy=""
+                  data-i18n="email"></a
+                >
+                <i class="bi bi-clipboard clipboard-btn"></i>
+              </p>
+              <p>
+                <i class="bi bi-globe"></i>
+                <span data-i18n="languages"></span>
+              </p>
+            </div>
+          </div>
+          <!-- Skill Tree Card -->
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="text-center" data-i18n="skills">Skill Mix</h5>
+              <div id="skill-tree-container"></div>
+              <p
+                id="skill-tree-legend"
+                class="text-center text-muted small mt-2"
+                data-i18n="skills_legend"
+              >
+                Larger skill tags indicate higher expertise.
+              </p>
+            </div>
+          </div>
+          <!-- Certificates & Accomplishments Card -->
+          <div class="card">
+            <div class="card-body">
+              <h5 class="text-center">Certificates &amp; Accomplishments</h5>
+              <div id="accomplishments-list" class="mt-2"></div>
+            </div>
+          </div>
+        </aside>
+        <!-- RIGHT COLUMN: Timeline & Positions -->
+        <main
+          class="col-md-8"
+          style="overflow-y: auto; min-height: calc(100vh - 60px)"
+        >
+          <div id="timeline-card" class="mb-2">
+            <h5 class="text-center" data-i18n="timeline">Visual Timeline</h5>
+            <div id="timeline-svg-container">
+              <svg id="timeline-svg"></svg>
+            </div>
+          </div>
+          <div id="position-list"></div>
+        </main>
+      </div>
+      <!-- Extra Content Container (if needed) -->
+      <div id="extra-content-container" class="mt-3"></div>
+    </div>
+
+    <!-- Embedded Default YAML Configuration -->
+    <script id="default-config" type="text/x-yaml">
+      page_title: "DevOps Engineer CV for John Doe"
+      cv_timestamp: "2025-03-13"
+      personal_info:
+        name: "John Doe"
+        title: "DevOps Engineer"
+        birthplace: "New York, USA"
+        dob: "1980-01-01"
+        phone: "+1 123-456-7890"
+        email: "john.doe@example.com"
+        #image: "https://img.freepik.com/fotos-kostenlos/die-rote-oder-weisse-katze-ich-auf-weissem-studio_155003-13189.jpg?semt=ais_hybrid"
+        languages: "English, German"
+        email_tooltip_en: "Click to send mail"
+        email_tooltip_de: "Mail senden"
+        phone_tooltip_en: "Click to call"
+        phone_tooltip_de: "Anrufen"
+
+      positions:
+        - id: "devops"
+          color: "#b3cde0"
+          translations:
+            en:
+              title: "DevOps Engineer"
+              company: "DevOps Company (former DEVYOPY.org)"
+              description:
+                - type: paragraph
+                  text: "Implemented CI/CD via GitHub, automated monitoring with OpsGenie and CloudWatch. And generally following parts:"
+                - type: list
+                  items:
+                    - "Designed service and infrastructure architecture"
+                    - "Practiced Scrum"
+                    - "Used Terraform and AWS"
+                - type: paragraph
+                  text: "And much more."
+            de:
+              title: "DevOps Engineer"
+              company: "DevOps Company (früher DEVYOPY.org)"
+              description: "Implementierung von CI/CD über GitHub Enterprise, automatisierte Überwachung mit CloudWatch, Planung und Umsetzung von Service- und Infrastrukturlösungen, Scrum, Terraform und AWS."
+          start: "2016-08"
+          end: "2023-03"
+          skills: ["AWS", "CI/CD", "Kubernetes"]
+        - id: "apprenticeship"
+          color: "#ccebc5"
+          company: "Company org, Rivertown"
+          translations:
+            en:
+              title: "Apprenticeship as a Systems Engineer"
+              description: "Focused on observability, logging, and automation."
+            de:
+              title: "Duale Ausbildung Fachinformatiker für Systemintegration"
+              description:
+                - type: paragraph
+                  text: 'Fokussiert auf Monitoring, Logging und Automatisierung'
+                - type: list
+                  items:
+                    - "Weiterbildung in Linux und Windows"
+                    - "Gemeinsame Projektarbeit and Terminalservern"
+                - type: paragraph
+                  text: 'Ich erreichte einen erfolgreichen Abschluss nach verkürzter Ausbildungszeit'
+          start: "2013-08"
+          end: "2016-07"
+          skills: ["Monitoring", "Bash", "Linux", "networking"]
+        - id: "volunteering"
+          color: "#fbd9a4"
+          translations:
+            en:
+              title: "Early volunteer work"
+              description: "Even as a youngster, I was involved in the local chapter of the German Red Cross."
+            de:
+              title: "Frühe ehrenamtliche Arbeit"
+              description: "Schon als Jugendlicher habe ich im Ortsverein des Deutschen Roten Kreuzes mitgewirkt."
+          start: "2000-05"
+          end: "2016-07"
+          skills: ["social", "empathy", "responsibility"]
+        - id: "secondary"
+          color: "#ebd9f4"
+          translations:
+            en:
+              title: "Secondary School"
+              description: ""
+            de:
+              title: "Realschule"
+              description: ""
+          start: "2001-08"
+          end: "2007-07"
+          skills: []
+        - id: "elementary"
+          color: "#f4e8d9"
+          translations:
+            en:
+              title: "Elementary School"
+              description: ""
+            de:
+              title: "Grundschule"
+              description: ""
+          start: "1995-08"
+          end: "2001-07"
+          skills: []
+      skills:
+        - id: "AWS"
+          level: 10
+          positions: ["devops"]
+        - id: "Linux"
+          level: 12
+          positions: ["apprenticeship", "admin"]
+        - id: "networking"
+          level: 4
+          positions: ["apprenticeship", "admin"]
+          translations:
+            en:
+              title: "Networking"
+            de:
+              title: "Netzwerktechnik"
+        - id: "Bash"
+          level: 10
+          positions: ["apprenticeship", "admin"]
+        - id: "social"
+          level: 7
+          positions: ["apprenticeship", "volunteering"]
+          translations:
+            en:
+              title: "Social Interaction"
+            de:
+              title: "Sozialkompetenz"
+
+      accomplishments:
+        - label: "volunteering"
+          positions: ["volunteering"]
+          skills: ["empathy", "social"]
+          attachment: "certificate-volunteering.pdf"
+          translations:
+            en:
+              label: "Volunteering Year Certificate"
+            de:
+              label: "FSJ-Bescheinigung"
+        - label: "lpic1"
+          positions: ["apprenticeship"]
+          skills: ["linux", "bash", "networking"]
+          attachment: "certificate-medical.pdf"
+          translations:
+            en:
+              label: "LPIC-1 Zertifizierung"
+            de:
+            label: "LPIC-1 Zertifizierung"
+        - label: "elementaryschoolcertificate"
+          positions: ["elementary"]
+          skills: ["music", "painting", "dancing"]
+          attachment: "es-cert.pdf"
+          translations:
+            en:
+              label: "Elementary School Certificate"
+            de:
+              label: "Grundschulabschlusszeugnis"
+
+      translations:
+        en:
+          timeline: "My Timeline"
+          skills: "My Mix of Skills"
+          skills_legend: "Larger skill tags indicate higher expertise/experience."
+          clipboard_copied: "Copied to clipboard"
+          skill_filter_toast: "Showing positions with skill: {skill}"
+          skill_filter_clear_toast: "Skill filter removed"
+        de:
+          timeline: "Mein Lebenslauf"
+          skills: "Meine Fähigkeiten"
+          skills_legend: "Größere Skill-Tags deuten auf höhere Expertise/Erfahrung hin."
+          clipboard_copied: "Kopiert!"
+          skill_filter_toast: "Zeige Positionen mit {skill}"
+          skill_filter_clear_toast: "Skillfilter entfernt"
+    </script>
+    <script id="custom-config" type="text/plain">
+{"salt":"d09X03Pqvetp/l9buXIiDA==","iv":"pBNxhwNTJgsjMipA","ciphertext":"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"}
+</script>
+    <!-- Main JavaScript -->
+    <script>
+      /*<![CDATA[*/
+      function hexToRgb(hex) {
+        hex = hex.replace(/^#/, "");
+        if (hex.length === 3)
+          hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        if (hex.length !== 6) return null;
+        return {
+          r: parseInt(hex.substring(0, 2), 16),
+          g: parseInt(hex.substring(2, 4), 16),
+          b: parseInt(hex.substring(4, 6), 16),
+        };
+      }
+      function rgbToHex(r, g, b) {
+        const toHex = (c) => ("0" + c.toString(16)).slice(-2);
+        return "#" + toHex(r) + toHex(g) + toHex(b);
+      }
+      function generateHCColor(hex) {
+        const rgb = hexToRgb(hex);
+        if (!rgb) return "#FFFF00";
+        let channels = [
+          { key: "r", value: rgb.r },
+          { key: "g", value: rgb.g },
+          { key: "b", value: rgb.b },
+        ].sort((a, b) => b.value - a.value);
+        rgb[channels[0].key] = Math.min(
+          255,
+          Math.floor(rgb[channels[0].key] * 5)
+        );
+        rgb[channels[1].key] = Math.min(
+          255,
+          Math.floor(rgb[channels[1].key] * 2)
+        );
+        rgb[channels[2].key] = Math.min(
+          255,
+          Math.floor(rgb[channels[2].key] / 5)
+        );
+        return rgbToHex(rgb.r, rgb.g, rgb.b);
+      }
+      function getDefaultColor(id) {
+        const palette = [
+          "#b3cde0",
+          "#ccebc5",
+          "#fbb4ae",
+          "#ebd9f4",
+          "#f4e8d9",
+          "#D0D9E2",
+          "#C3C2D5",
+        ];
+        let hash = 0;
+        for (let i = 0; i < id.length; i++) {
+          hash = id.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % palette.length;
+        return palette[index];
+      }
+      function getPositionColor(id) {
+        const pos = config.positions.find((p) => p.id === id);
+        let normal = pos && pos.color ? pos.color : getDefaultColor(id);
+        let highContrast =
+          pos && pos.highContrastColor
+            ? pos.highContrastColor
+            : generateHCColor(normal);
+        return { normal, highContrast };
+      }
+      function renderContent(content) {
+        if (typeof content === "string") {
+          const p = document.createElement("p");
+          p.innerHTML = content.replace(/\n/g, "<br>");
+          return p;
+        }
+        if (Array.isArray(content)) {
+          const fragment = document.createDocumentFragment();
+          content.forEach((item) => {
+            fragment.appendChild(renderContent(item));
+          });
+          return fragment;
+        }
+        if (typeof content === "object" && content !== null) {
+          if (content.type === "paragraph") {
+            const p = document.createElement("p");
+            p.innerHTML = content.text
+              ? content.text.replace(/\n/g, "<br>")
+              : "";
+            return p;
+          } else if (content.type === "list") {
+            const ul = document.createElement("ul");
+            ul.className = "list-group list-group-flush";
+            if (Array.isArray(content.items)) {
+              content.items.forEach((item) => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.appendChild(renderContent(item));
+                ul.appendChild(li);
+              });
+            }
+            return ul;
+          } else {
+            const p = document.createElement("p");
+            p.innerHTML = content.text
+              ? content.text.replace(/\n/g, "<br>")
+              : "";
+            return p;
+          }
+        }
+        return document.createElement("div");
+      }
+      function showToastSkillFilter(skillName) {
+        const toastEl = document.getElementById("clipboard-toast");
+        const toastText = document.getElementById("clipboard-toast-text");
+        if (skillName) {
+          let msgTemplate =
+            config.translations[currentLanguage].skill_filter_toast ||
+            "Showing positions with skill: {skill}";
+          toastText.textContent = msgTemplate.replace("{skill}", skillName);
+        } else {
+          let msg =
+            config.translations[currentLanguage].skill_filter_clear_toast ||
+            "Skill filter removed";
+          toastText.textContent = msg;
+        }
+        toastEl.style.display = "block";
+        setTimeout(() => {
+          toastEl.style.display = "none";
+        }, 2000);
+      }
+      function updateTranslations() {
+        const trans = config.translations;
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (trans[currentLanguage] && trans[currentLanguage][key]) {
+            el.textContent = trans[currentLanguage][key];
+          }
+        });
+        document.getElementById("lang-toggle").textContent =
+          currentLanguage === "en" ? "Switch to German" : "Switch to English";
+        const emailLink = document.getElementById("email-link");
+        if (emailLink) {
+          emailLink.title =
+            currentLanguage === "en"
+              ? config.personal_info.email_tooltip_en
+              : config.personal_info.email_tooltip_de;
+        }
+        const phoneLink = document.getElementById("phone-link");
+        if (phoneLink) {
+          phoneLink.title =
+            currentLanguage === "en"
+              ? config.personal_info.phone_tooltip_en
+              : config.personal_info.phone_tooltip_de;
+        }
+        document.querySelectorAll(".position-card").forEach((card) => {
+          const pid = card.getAttribute("data-id");
+          const pos = config.positions.find((p) => p.id === pid);
+          if (pos && pos.translations && pos.translations[currentLanguage]) {
+            const t = pos.translations[currentLanguage];
+            card.querySelector("h5").textContent = t.title || pos.title;
+            card.querySelector("h6").textContent = t.company || pos.company;
+            let descContainer = card.querySelector(".position-description");
+            if (!descContainer) {
+              descContainer = document.createElement("div");
+              descContainer.classList.add("position-description");
+              card.appendChild(descContainer);
+            }
+            descContainer.innerHTML = "";
+            if (t.description || pos.description) {
+              descContainer.appendChild(
+                renderContent(t.description || pos.description)
+              );
+            }
+          }
+        });
+        d3.selectAll(".skill-bubble").each(function (d) {
+          if (
+            d.translations &&
+            d.translations[currentLanguage] &&
+            d.translations[currentLanguage].title
+          ) {
+            d3.select(this).text(d.translations[currentLanguage].title);
+          } else {
+            d3.select(this).text(d.id);
+          }
+        });
+        document.querySelectorAll(".accomplishment-item").forEach((item) => {
+          const accData = item.dataset.acc
+            ? JSON.parse(item.dataset.acc)
+            : null;
+          if (
+            accData &&
+            accData.translations &&
+            accData.translations[currentLanguage] &&
+            accData.translations[currentLanguage].label
+          ) {
+            const span = item.querySelector("span");
+            if (span)
+              span.textContent = accData.translations[currentLanguage].label;
+          }
+        });
+        document
+          .querySelectorAll(".position-badges span.badge")
+          .forEach((badge) => {
+            let skillId =
+              badge.getAttribute("data-skill") || badge.textContent.trim();
+            const skillObj = config.skills.find((s) => s.id === skillId);
+            if (
+              skillObj &&
+              skillObj.translations &&
+              skillObj.translations[currentLanguage] &&
+              skillObj.translations[currentLanguage].title
+            ) {
+              badge.textContent = skillObj.translations[currentLanguage].title;
+            } else {
+              badge.textContent = skillId;
+            }
+          });
+      }
+      function toggleLanguage() {
+        currentLanguage = currentLanguage === "en" ? "de" : "en";
+        updateTranslations();
+      }
+      function updateColors() {
+        document.querySelectorAll(".position-card").forEach((card) => {
+          const { normal, highContrast } = getPositionColor(
+            card.getAttribute("data-id")
+          );
+          card.style.setProperty(
+            "border-left-color",
+            document.body.classList.contains("high-contrast")
+              ? highContrast
+              : normal,
+            "important"
+          );
+        });
+        applyTimelineColors();
+      }
+      function toggleContrast() {
+        document.body.classList.toggle("high-contrast");
+        updateColors();
+      }
+      function populatePersonalInfo(info) {
+        const nameEl = document.querySelector('[data-i18n="name"]');
+        if (nameEl) {
+          nameEl.textContent = info.name;
+          nameEl.setAttribute("data-copy", info.name);
+        }
+        const titleEl = document.querySelector('[data-i18n="title"]');
+        if (titleEl) titleEl.textContent = info.title;
+        const birthEl = document.querySelector('[data-i18n="birthplace"]');
+        if (birthEl) birthEl.textContent = info.birthplace;
+        const dobEl = document.querySelector('[data-i18n="dob"]');
+        if (dobEl) dobEl.textContent = info.dob;
+        const phoneEl = document.querySelector('[data-i18n="phone"]');
+        if (phoneEl) {
+          phoneEl.textContent = info.phone;
+          phoneEl.setAttribute("data-copy", info.phone);
+        }
+        const langEl = document.querySelector('[data-i18n="languages"]');
+        if (langEl) langEl.textContent = info.languages;
+        const emailElem = document.querySelector('[data-i18n="email"]');
+        if (emailElem) {
+          emailElem.textContent = info.email;
+          emailElem.setAttribute("data-copy", info.email);
+        }
+        const emailLink = document.getElementById("email-link");
+        if (emailLink) emailLink.href = `mailto:"${info.name}"<${info.email}>`;
+        const phoneLink = document.getElementById("phone-link");
+        if (phoneLink)
+          phoneLink.href = "tel:" + info.phone.replace(/[^0-9+]/g, "");
+
+        getProfileImage(info.email, info.image).then(profileImageSrc => {
+          const imgElement = document.getElementById("portrait-image");
+          if (imgElement) imgElement.src = profileImageSrc;
+        });
+      }
+      function populatePositions(positions) {
+        const container = document.getElementById("position-list");
+        container.innerHTML = "";
+        positions.forEach((pos) => {
+          const card = document.createElement("div");
+          card.classList.add("card", "position-card", "p-3");
+          card.setAttribute("data-id", pos.id);
+          card.setAttribute("data-start", pos.start);
+          card.setAttribute("data-end", pos.end);
+          card.setAttribute("data-company", pos.company);
+          card.setAttribute("data-skills", (pos.skills || []).join(","));
+          const { normal, highContrast } = getPositionColor(pos.id);
+          card.style.setProperty(
+            "border-left-color",
+            document.body.classList.contains("high-contrast")
+              ? highContrast
+              : normal,
+            "important"
+          );
+          const t =
+            pos.translations && pos.translations[currentLanguage]
+              ? pos.translations[currentLanguage]
+              : {};
+          const title = t.title || pos.title || pos.id;
+          card.innerHTML = `<h5 class="card-title mb-1">${title}</h5>
+      <h6 class="card-subtitle mb-1 text-muted company">${pos.company}</h6>
+      <h7 class="card-subtitle mb-2 text-muted date"><span class="start-date">${pos.start}</span> – <span class="end-date">${pos.end}</span></h7>`;
+          const descContainer = document.createElement("div");
+          descContainer.classList.add("position-description", "card-text");
+          if (t.description || pos.description) {
+            descContainer.appendChild(
+              renderContent(t.description || pos.description)
+            );
+          }
+          card.appendChild(descContainer);
+          if (pos.skills && pos.skills.length > 0) {
+            const badgeContainer = document.createElement("div");
+            badgeContainer.classList.add("position-badges");
+            pos.skills.forEach((skill) => {
+              const badge = document.createElement("span");
+              badge.classList.add("badge", "bg-secondary", "ms-1");
+              badge.setAttribute("data-skill", skill);
+              badge.textContent = skill;
+              badge.style.cursor = "pointer";
+              badge.addEventListener("click", function (event) {
+                event.stopPropagation();
+                if (selectedSkill === skill) {
+                  selectedSkill = null;
+                  d3.selectAll(".skill-bubble").classed("selected", false);
+                  document
+                    .querySelectorAll(".position-card")
+                    .forEach((card) => {
+                      card.classList.remove("dimmed", "highlighted");
+                    });
+                  showToastSkillFilter("");
+                } else {
+                  selectedSkill = skill;
+                  d3.selectAll(".skill-bubble").classed("selected", false);
+                  d3.selectAll(".skill-bubble")
+                    .filter(function (d) {
+                      return d.id === skill;
+                    })
+                    .classed("selected", true);
+                  document
+                    .querySelectorAll(".position-card")
+                    .forEach((card) => {
+                      const skills = card
+                        .getAttribute("data-skills")
+                        .split(",")
+                        .map((s) => s.trim());
+                      if (skills.includes(skill)) {
+                        card.classList.add("highlighted");
+                        card.classList.remove("dimmed");
+                      } else {
+                        card.classList.add("dimmed");
+                      }
+                    });
+                  let skillName = skill;
+                  d3.selectAll(".skill-bubble").each(function (d) {
+                    if (
+                      d.id === skill &&
+                      d.translations &&
+                      d.translations[currentLanguage] &&
+                      d.translations[currentLanguage].title
+                    ) {
+                      skillName = d.translations[currentLanguage].title;
+                    }
+                  });
+                  showToastSkillFilter(skillName);
+                }
+              });
+              badgeContainer.appendChild(badge);
+            });
+            card.style.position = "relative";
+            card.appendChild(badgeContainer);
+          }
+          container.appendChild(card);
+        });
+      }
+      function populateSkills(skills) {
+        window.skillData = skills;
+        initSkillTree();
+      }
+      function initSkillTree() {
+        const container = d3.select("#skill-tree-container");
+        const width = container.node().clientWidth;
+        const height = container.node().clientHeight;
+        container.selectAll(".skill-bubble").remove();
+        const nodes = window.skillData.map((d) => Object.assign({}, d));
+        const skillBubbles = container
+          .selectAll(".skill-bubble")
+          .data(nodes)
+          .enter()
+          .append("button")
+          .attr("type", "button")
+          .attr("class", "skill-bubble btn btn-light")
+          .style("font-size", (d) => 10 + d.level * 2 + "px")
+          .text((d) => {
+            if (
+              d.translations &&
+              d.translations[currentLanguage] &&
+              d.translations[currentLanguage].title
+            ) {
+              return d.translations[currentLanguage].title;
+            }
+            return d.id;
+          });
+        skillBubbles.on("mouseenter", (evt, d) => {
+          d3.select(evt.currentTarget).classed("hovered", true);
+          highlightPositions(d.positions);
+          highlightSkillBubbles([d.id]);
+        });
+        skillBubbles.on("mouseleave", (evt, d) => {
+          d3.select(evt.currentTarget).classed("hovered", false);
+          if (!selectedSkill) {
+            unhighlightAllPositions();
+            unhighlightAllSkills();
+          }
+        });
+        skillBubbles.on("click", function (event, d) {
+          event.stopPropagation();
+          if (selectedSkill === d.id) {
+            selectedSkill = null;
+            d3.selectAll(".skill-bubble").classed("selected", false);
+            document.querySelectorAll(".position-card").forEach((card) => {
+              card.classList.remove("dimmed", "highlighted");
+            });
+            showToastSkillFilter("");
+          } else {
+            selectedSkill = d.id;
+            d3.selectAll(".skill-bubble").classed("selected", false);
+            d3.select(this).classed("selected", true);
+            document.querySelectorAll(".position-card").forEach((card) => {
+              const skills = card
+                .getAttribute("data-skills")
+                .split(",")
+                .map((s) => s.trim());
+              if (skills.includes(d.id)) {
+                card.classList.add("highlighted");
+                card.classList.remove("dimmed");
+              } else {
+                card.classList.add("dimmed");
+              }
+            });
+            let skillName =
+              d.translations &&
+              d.translations[currentLanguage] &&
+              d.translations[currentLanguage].title
+                ? d.translations[currentLanguage].title
+                : d.id;
+            showToastSkillFilter(skillName);
+          }
+        });
+        const simulation = d3
+          .forceSimulation(nodes)
+          .force("charge", d3.forceManyBody().strength(-60))
+          .force("x", d3.forceX(width / 2).strength(0.16))
+          .force("y", d3.forceY(height / 2).strength(0.16))
+          .force(
+            "collision",
+            d3
+              .forceCollide()
+              .radius((d) => 20 + d.level * 4)
+              .iterations(2)
+          )
+          .on("tick", () => {
+            skillBubbles
+              .style(
+                "left",
+                (d) => Math.max(0, Math.min(width - 130, d.x)) + "px"
+              )
+              .style(
+                "top",
+                (d) => Math.max(0, Math.min(height - 50, d.y)) + "px"
+              );
+          });
+        simulation.alphaTarget(0.2).restart();
+      }
+      function toDate(dateStr) {
+        const parseDate = d3.timeParse("%Y-%m");
+        const parseYear = d3.timeParse("%Y");
+        return dateStr.includes("-") ? parseDate(dateStr) : parseYear(dateStr);
+      }
+      function initTimeline() {
+        const positions = Array.from(
+          document.querySelectorAll(".position-card")
+        )
+          .reverse()
+          .map((card) => {
+            const pid = card.getAttribute("data-id");
+            const startStr = card.getAttribute("data-start");
+            const endStr = card.getAttribute("data-end");
+            const skills = (card.getAttribute("data-skills") || "")
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
+            return {
+              id: pid,
+              start: startStr,
+              end: endStr,
+              skills,
+              startDate: toDate(startStr),
+              endDate: toDate(endStr),
+            };
+          });
+        if (!positions.length) return;
+        const minDate = d3.min(positions, (d) => d.startDate);
+        const maxDate = d3.max(positions, (d) => d.endDate);
+        const svgEl = document.getElementById("timeline-svg");
+        const width = svgEl.clientWidth;
+        const height = svgEl.clientHeight;
+        const svg = d3.select(svgEl);
+        svg.selectAll("*").remove();
+        const xScale = d3
+          .scaleTime()
+          .domain([minDate, maxDate])
+          .range([50, width - 50]);
+        const xAxis = d3.axisBottom(xScale).ticks(5);
+        svg
+          .append("g")
+          .attr("transform", `translate(0, ${height - 20})`)
+          .call(xAxis);
+        let tooltip = d3.select("body").select("#timeline-tooltip");
+        if (tooltip.empty()) {
+          tooltip = d3
+            .select("body")
+            .append("div")
+            .attr("id", "timeline-tooltip")
+            .attr("class", "tooltip-custom");
+        }
+        svg
+          .selectAll(".timeline-rect")
+          .data(positions)
+          .enter()
+          .append("rect")
+          .attr("class", "timeline-rect")
+          .attr("data-id", (d) => d.id)
+          .attr("x", (d) => xScale(d.startDate))
+          .attr("y", height - 70)
+          .attr("width", (d) =>
+            Math.max(5, xScale(d.endDate) - xScale(d.startDate))
+          )
+          .attr("height", 40)
+          .attr("fill", (d) => {
+            const { normal, highContrast } = getPositionColor(d.id);
+            return document.body.classList.contains("high-contrast")
+              ? highContrast
+              : normal;
+          })
+          .on("mouseenter", function (event, d) {
+            const card = document.querySelector(
+              `.position-card[data-id='${d.id}']`
+            );
+            if (card) card.classList.add("highlighted");
+            highlightSkillBubbles(d.skills);
+            highlightAccomplishments({ positions: [d.id], skills: d.skills });
+            const posConfig = config.positions.find((p) => p.id === d.id);
+            const posTitle =
+              posConfig &&
+              posConfig.translations &&
+              posConfig.translations[currentLanguage]
+                ? posConfig.translations[currentLanguage].title
+                : posConfig
+                ? posConfig.title
+                : d.id;
+            tooltip
+              .html(`Position: ${posTitle}<br>From: ${d.start}<br>To: ${d.end}`)
+              .style("opacity", 1)
+              .style("left", event.pageX + 10 + "px")
+              .style("top", event.pageY + 10 + "px");
+          })
+          .on("mousemove", function (event) {
+            tooltip
+              .style("left", event.pageX + 10 + "px")
+              .style("top", event.pageY + 10 + "px");
+          })
+          .on("mouseleave", function (event, d) {
+            const card = document.querySelector(
+              `.position-card[data-id='${d.id}']`
+            );
+            if (card) card.classList.remove("highlighted");
+            unhighlightAllSkills();
+            unhighlightAccomplishments();
+            tooltip.style("opacity", 0);
+          })
+          .on("click", function (event, d) {
+            const card = document.querySelector(
+              `.position-card[data-id='${d.id}']`
+            );
+            if (card)
+              card.scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+        applyTimelineColors();
+        positionRects(xScale);
+      }
+      function applyTimelineColors() {
+        document.querySelectorAll(".timeline-rect").forEach((rect) => {
+          const d = rect.__data__;
+          const { normal, highContrast } = getPositionColor(d.id);
+          rect.style.fill = document.body.classList.contains("high-contrast")
+            ? highContrast
+            : normal;
+        });
+      }
+      function positionRects(xScale) {
+        const rects = d3.selectAll(".timeline-rect");
+        const occupied = [];
+        rects.each(function (d) {
+          const rect = d3.select(this);
+          const x = xScale(d.startDate);
+          const width = Math.max(5, xScale(d.endDate) - xScale(d.startDate));
+          const height = 40;
+          let y = height + 0;
+          let overlapping = true;
+          while (overlapping) {
+            overlapping = false;
+            for (const occupiedRect of occupied) {
+              if (
+                x < occupiedRect.x + occupiedRect.width &&
+                x + width > occupiedRect.x &&
+                y < occupiedRect.y + occupiedRect.height &&
+                y + height > occupiedRect.y
+              ) {
+                y -= 2;
+                overlapping = true;
+                break;
+              }
+            }
+          }
+          rect.attr("y", y);
+          occupied.push({ x, y, width, height });
+        });
+      }
+      function highlightPositions(posIds) {
+        document.querySelectorAll(".position-card").forEach((card) => {
+          const cID = card.getAttribute("data-id");
+          if (!posIds.includes(cID)) {
+            card.classList.add("dimmed");
+          } else {
+            card.classList.remove("dimmed");
+            card.classList.add("highlighted");
+          }
+        });
+      }
+      function unhighlightAllPositions() {
+        document
+          .querySelectorAll(".position-card")
+          .forEach((card) => card.classList.remove("dimmed", "highlighted"));
+      }
+      function highlightSkillBubbles(skillNames) {
+        const container = d3.select("#skill-tree-container");
+        container.selectAll(".skill-bubble").each(function (sd) {
+          if (skillNames.includes(sd.id))
+            d3.select(this).classed("hovered", true);
+          else d3.select(this).classed("dimmed", true);
+        });
+      }
+      function unhighlightAllSkills() {
+        const container = d3.select("#skill-tree-container");
+        container
+          .selectAll(".skill-bubble")
+          .classed("hovered", false)
+          .classed("dimmed", false);
+      }
+      function highlightAccomplishments(criteria) {
+        document.querySelectorAll(".accomplishment-item").forEach((acc) => {
+          const accPositions = (acc.getAttribute("data-positions") || "")
+            .split(",")
+            .map((s) => s.trim());
+          const accSkills = (acc.getAttribute("data-skills") || "")
+            .split(",")
+            .map((s) => s.trim());
+          const posMatch =
+            criteria.positions &&
+            criteria.positions.some((p) => accPositions.includes(p));
+          const skillMatch =
+            criteria.skills &&
+            criteria.skills.some((s) => accSkills.includes(s));
+          if (posMatch || skillMatch) acc.classList.add("hovered");
+          else acc.classList.remove("hovered");
+        });
+      }
+      function unhighlightAccomplishments() {
+        document
+          .querySelectorAll(".accomplishment-item")
+          .forEach((acc) => acc.classList.remove("hovered"));
+      }
+      function initButtonBounceEffect() {
+        document.querySelectorAll(".btn, .clipboard-btn").forEach((btn) => {
+          btn.addEventListener("mousedown", () => {
+            btn.style.transform = "scale(0.95)";
+          });
+          btn.addEventListener("mouseup", () => {
+            btn.style.transform = "scale(1)";
+          });
+          btn.addEventListener("mouseleave", () => {
+            btn.style.transform = "scale(1)";
+          });
+        });
+      }
+      function initClipboardHandlers() {
+        document.querySelectorAll(".copyable").forEach((elem) => {
+          const clipboardIcon =
+            elem.parentElement.querySelector(".clipboard-btn");
+          if (clipboardIcon) {
+            clipboardIcon.addEventListener("mousedown", () => {
+              clipboardIcon.style.transform = "scale(0.95)";
+            });
+            clipboardIcon.addEventListener("mouseup", () => {
+              clipboardIcon.style.transform = "scale(1)";
+              const text = elem.getAttribute("data-copy") || elem.textContent;
+              copyTextToClipboard(text);
+            });
+          }
+          elem.addEventListener("mousedown", () => {
+            elem.style.transform = "scale(0.95)";
+          });
+          elem.addEventListener("mouseup", () => {
+            elem.style.transform = "scale(1)";
+          });
+        });
+      }
+      function copyTextToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast();
+        });
+      }
+      function showToast() {
+        const toastEl = document.getElementById("clipboard-toast");
+        const toastText = document.getElementById("clipboard-toast-text");
+        toastText.textContent =
+          config.translations[currentLanguage].clipboard_copied;
+        toastEl.style.display = "block";
+        setTimeout(() => {
+          toastEl.style.display = "none";
+        }, 2000);
+      }
+      function populateAccomplishments(accomplishments) {
+        const container = document.getElementById("accomplishments-list");
+        container.innerHTML = "";
+        accomplishments.forEach((ac) => {
+          const item = document.createElement("div");
+          item.classList.add("accomplishment-item");
+          item.setAttribute("data-positions", ac.positions.join(","));
+          item.setAttribute("data-skills", ac.skills.join(","));
+          item.dataset.acc = JSON.stringify(ac);
+          let labelText = ac.label;
+          if (
+            ac.translations &&
+            ac.translations[currentLanguage] &&
+            ac.translations[currentLanguage].label
+          ) {
+            labelText = ac.translations[currentLanguage].label;
+          }
+          item.innerHTML = `<span>${labelText}</span>`;
+          if (ac.attachment) {
+            const btn = document.createElement("a");
+            btn.href = ac.attachment;
+            btn.target = "_blank";
+            btn.classList.add("btn", "btn-outline-secondary", "btn-sm", "ms-2");
+            btn.innerHTML = `<i class="bi bi-paperclip"></i> Open`;
+            btn.addEventListener("mousedown", () => {
+              btn.style.transform = "scale(0.95)";
+            });
+            btn.addEventListener("mouseup", () => {
+              btn.style.transform = "scale(1)";
+            });
+            item.appendChild(btn);
+          }
+          item.addEventListener("mouseenter", () => {
+            item.classList.add("hovered");
+            highlightPositions(ac.positions);
+            highlightSkillBubbles(ac.skills);
+          });
+          item.addEventListener("mouseleave", () => {
+            item.classList.remove("hovered");
+            unhighlightAllPositions();
+            unhighlightAllSkills();
+          });
+          container.appendChild(item);
+        });
+      }
+      function initPositionHover() {
+        document.querySelectorAll(".position-card").forEach((card) => {
+          card.addEventListener("mouseenter", () => {
+            const rect = document.querySelector(
+              `.timeline-rect[data-id='${card.getAttribute("data-id")}']`
+            );
+            if (rect) rect.classList.add("hovered");
+            const skillNames = (card.getAttribute("data-skills") || "")
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
+            highlightSkillBubbles(skillNames);
+            highlightAccomplishments({
+              positions: [card.getAttribute("data-id")],
+              skills: skillNames,
+            });
+            document.querySelectorAll(".timeline-rect").forEach((r) => {
+              if (r.getAttribute("data-id") !== card.getAttribute("data-id"))
+                r.classList.add("dimmed");
+            });
+          });
+          card.addEventListener("mouseleave", () => {
+            const rect = document.querySelector(
+              `.timeline-rect[data-id='${card.getAttribute("data-id")}']`
+            );
+            if (rect) rect.classList.remove("hovered");
+            unhighlightAllSkills();
+            unhighlightAccomplishments();
+            document.querySelectorAll(".timeline-rect").forEach((r) => {
+              r.classList.remove("dimmed");
+            });
+          });
+        });
+      }
+
+      async function sha256Hash(input) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(byte => byte.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+async function getProfileImage(email, yamlImage) {
+    if (yamlImage) {
+        return yamlImage; // Use the image from YAML if provided
+    }
+
+    if (email) {
+        const emailHash = await sha256Hash(email.trim().toLowerCase());
+        return `https://api.dicebear.com/7.x/identicon/svg?seed=${emailHash}`;
+    }
+
+    return "https://ui-avatars.com/api/?name=User&size=150"; // Default placeholder
+}
+      // Derive a key from a password and salt using PBKDF2.
+      async function deriveKey(password, salt) {
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+          "raw",
+          enc.encode(password),
+          { name: "PBKDF2" },
+          false,
+          ["deriveKey"]
+        );
+        return window.crypto.subtle.deriveKey(
+          {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 100000,
+            hash: "SHA-256",
+          },
+          keyMaterial,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["encrypt", "decrypt"]
+        );
+      }
+      // Decrypt the given encrypted data (a JSON string) using AES-GCM.
+      async function decryptText(encryptedData, password) {
+        try {
+          const data = JSON.parse(encryptedData);
+          const salt = Uint8Array.from(atob(data.salt), (c) => c.charCodeAt(0));
+          const iv = Uint8Array.from(atob(data.iv), (c) => c.charCodeAt(0));
+          const ciphertext = Uint8Array.from(atob(data.ciphertext), (c) =>
+            c.charCodeAt(0)
+          );
+          const key = await deriveKey(password, salt);
+          const decrypted = await window.crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: iv },
+            key,
+            ciphertext
+          );
+          const dec = new TextDecoder();
+          return dec.decode(decrypted);
+        } catch (error) {
+          throw new Error("Decryption error: " + error.message);
+        }
+      }
+      // Initialize passphrase UI and handler.
+      function initPassphraseHandler() {
+        const toggleBtn = document.getElementById("toggle-passphrase");
+        const passInput = document.getElementById("passphrase-input");
+        toggleBtn.addEventListener("click", function () {
+          if (passInput.type === "password") {
+            passInput.type = "text";
+            toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+          } else {
+            passInput.type = "password";
+            toggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
+          }
+        });
+        document
+          .getElementById("passphrase-submit")
+          .addEventListener("click", async function () {
+            const passphrase = passInput.value.trim();
+            if (!passphrase) {
+              alert("Passphrase is required to decrypt configuration.");
+              return;
+            }
+            const encryptedYAML = document
+              .getElementById("custom-config")
+              .textContent.trim();
+            let decryptedYAML;
+            try {
+              decryptedYAML = await decryptText(encryptedYAML, passphrase);
+              if (!decryptedYAML) {
+                throw new Error(
+                  "Empty decryption result. Possibly an incorrect passphrase."
+                );
+              }
+            } catch (error) {
+              alert("Decryption failed: " + error.message);
+              return;
+            }
+            try {
+              const newConfig = jsyaml.load(decryptedYAML);
+              config = newConfig;
+              if (config.page_title) document.title = config.page_title;
+              if (config.cv_timestamp)
+                document.getElementById("cv-timestamp").textContent =
+                  "Created: " + config.cv_timestamp;
+              populatePersonalInfo(config.personal_info);
+              populatePositions(config.positions);
+              populateSkills(config.skills);
+              populateAccomplishments(config.accomplishments);
+              updateTranslations();
+              initTimeline();
+              initPositionHover();
+              alert("Configuration unlocked successfully!");
+            } catch (error) {
+              alert("YAML parsing failed: " + error.message);
+              return;
+            }
+          });
+      }
+      function initCV() {
+        const defaultText =
+          document.getElementById("default-config").textContent;
+        config = jsyaml.load(defaultText);
+        if (config.page_title) document.title = config.page_title;
+        if (config.cv_timestamp)
+          document.getElementById("cv-timestamp").textContent =
+            "Created: " + config.cv_timestamp;
+        populatePersonalInfo(config.personal_info);
+        populatePositions(config.positions);
+        populateSkills(config.skills);
+        populateAccomplishments(config.accomplishments);
+        updateTranslations();
+        initTimeline();
+        initPositionHover();
+        initClipboardHandlers();
+        initButtonBounceEffect();
+        initPassphraseHandler();
+      }
+      let currentLanguage = "en";
+      let config = null;
+      let selectedSkill = null;
+      document.addEventListener("DOMContentLoaded", initCV);
+      document.addEventListener("click", function (event) {
+        if (!event.target.closest(".skill-bubble") && selectedSkill !== null) {
+          selectedSkill = null;
+          d3.selectAll(".skill-bubble").classed("selected", false);
+          document.querySelectorAll(".position-card").forEach((card) => {
+            card.classList.remove("dimmed", "highlighted");
+          });
+          showToastSkillFilter("");
+        }
+      });
+      document.getElementById("passphrase-input").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault(); // Prevent form submission if inside a form
+          document.getElementById("passphrase-submit").click();
+        }
+      });
+      let resizeTimer;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          initSkillTree();
+          initTimeline();
+        }, 200);
+      });
+      /*]]>*/
+    </script>
+  </body>
+</html>

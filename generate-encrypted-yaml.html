@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Encrypt YAML Configuration</title>
+    <!-- Only need js-yaml for YAML parsing if required -->
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  </head>
+  <!-- Embedded YAML Configuration -->
+  <script id="default-config" type="text/x-yaml">
+page_title: "CV for John Doe"
+cv_timestamp: "2025-03-13"
+personal_info:
+  name: "Max Mustermann"
+  title: "Systems Engineer"
+  birthplace: "Berlin, Germany"
+  dob: "1990-01-21"
+  phone: "+49 170 994883"
+  email: "max@mustercloud.de"
+  languages: "English, German, French"
+  email_tooltip_en: "Click to send mail"
+  email_tooltip_de: "Mail senden"
+  phone_tooltip_en: "Click to call"
+  phone_tooltip_de: "Anrufen"
+
+positions:
+  - id: "1"
+    color: "#b3cde0"
+    company: "1 GmbH"
+    translations:
+      en:
+        title: "Systems Engineer"
+        description:
+          - type: paragraph
+            text: "Implemented CI/CD via GitHub, automated monitoring with OpsGenie and CloudWatch."
+          - type: list
+            items:
+              - "Designed service and infrastructure architecture"
+              - "Practiced Scrum"
+              - "Used Terraform and AWS"
+          - type: paragraph
+            text: "And much more."
+      de:
+        title: "Fachinformatiker"
+        description: "Implementierung von CI/CD über GitHub Enterprise, automatisierte Überwachung mit OpsGenie und CloudWatch, Planung und Umsetzung von Service- und Infrastrukturlösungen, Scrum, Terraform und AWS."
+    start: "2020-03"
+    end: "2025-03"
+    skills: ["AWS", "CI/CD", "Opsgenie", "CloudWatch"]
+  - id: "2"
+    color: "#b3cde0"
+    company: "2 GmbH"
+    translations:
+      en:
+        title: "Admin"
+        description: "Maintained Servers."
+
+      de:
+        title: "Systemadministrator"
+        description: "Verwaltete Server."
+    start: "2015-03"
+    end: "2020-02"
+    skills: ["CI/CD", "Hardware"]
+
+
+skills:
+  - id: "GitHub"
+    level: 10
+    positions: ["1"]
+  - id: "AWS"
+    level: 3
+    positions: ["1"]
+  - id: "CI/CD"
+    level: 3
+    positions: ["1", "2"]
+  - id: "Hardware"
+    level: 7
+    positions: ["1", "2"]
+
+accomplishments:
+  - label: "aws"
+    positions: ["1"]
+    skills: ["AWS"]
+    attachment: "label.pdf"
+    translations:
+      en:
+        label: "AWS Certificate"
+      de:
+        label: "AWS Zertifizierung"
+
+translations:
+  en:
+    timeline: "My Timeline"
+    skills: "My Mix of Skills"
+    skills_legend: "Larger skill tags indicate higher expertise/experience."
+    clipboard_copied: "Copied to clipboard"
+    skill_filter_toast: "Showing positions with skill: {skill}"
+    skill_filter_clear_toast: "Skill filter removed"
+  de:
+    timeline: "Mein Lebenslauf"
+    skills: "Meine Fähigkeiten"
+    skills_legend: "Größere Skill-Tags deuten auf höhere Expertise/Erfahrung hin."
+    clipboard_copied: "Kopiert!"
+    skill_filter_toast: "Zeige Positionen mit {skill}"
+    skill_filter_clear_toast: "Skillfilter entfernt"
+  </script>
+  <body>
+    <script>
+      // Derive a key from a password and salt using PBKDF2.
+      async function deriveKey(password, salt) {
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+          "raw",
+          enc.encode(password),
+          { name: "PBKDF2" },
+          false,
+          ["deriveKey"]
+        );
+        return crypto.subtle.deriveKey(
+          {
+            name: "PBKDF2",
+            salt: salt,
+            iterations: 100000,
+            hash: "SHA-256",
+          },
+          keyMaterial,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["encrypt", "decrypt"]
+        );
+      }
+
+      // Encrypt plaintext using AES-GCM.
+      async function encryptText(plaintext, password) {
+        const enc = new TextEncoder();
+        const salt = crypto.getRandomValues(new Uint8Array(16)); // 16 bytes salt
+        const iv = crypto.getRandomValues(new Uint8Array(12)); // 12 bytes IV for AES-GCM
+        const key = await deriveKey(password, salt);
+        const ciphertextBuffer = await crypto.subtle.encrypt(
+          { name: "AES-GCM", iv: iv },
+          key,
+          enc.encode(plaintext)
+        );
+        // Helper function: convert ArrayBuffer to Base64.
+        const toBase64 = (buffer) =>
+          btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        return JSON.stringify({
+          salt: toBase64(salt),
+          iv: toBase64(iv),
+          ciphertext: toBase64(ciphertextBuffer),
+        });
+      }
+
+      // Immediately invoke an async function to encrypt the YAML.
+      (async () => {
+        const yamlData = document
+          .getElementById("default-config")
+          .textContent.trim();
+        const passphrase = prompt("Enter passphrase to encrypt configuration:");
+        if (!passphrase) {
+          alert("Passphrase is required.");
+          return;
+        }
+        try {
+          const encryptedOutput = await encryptText(yamlData, passphrase);
+          console.log("Encrypted YAML:", encryptedOutput);
+          alert(
+            "Encryption successful! Check the console for the encrypted data."
+          );
+        } catch (error) {
+          alert("Encryption failed: " + error.message);
+        }
+      })();
+    </script>
+  </body>
+</html>
