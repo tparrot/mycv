@@ -1586,54 +1586,63 @@
 
       return "https://ui-avatars.com/api/?name=User&size=150"; // Default placeholder
     }
-
-    // Derive a key from a password and salt using PBKDF2.
-    function deriveKey(password, salt) {
+    // Import the passphrase as a CryptoKey using PBKDF2
+    async function importKey(passphrase) {
       const enc = new TextEncoder();
-      const keyMaterial = window.crypto.subtle.importKey(
+      const keyMaterial = await crypto.subtle.importKey(
         "raw",
-        enc.encode(password),
+        enc.encode(passphrase),
         { name: "PBKDF2" },
         false,
         ["deriveKey"]
       );
-      return window.crypto.subtle.deriveKey(
+      // Debug: Ensure keyMaterial is a CryptoKey
+      if (!(keyMaterial instanceof CryptoKey)) {
+        throw new Error("Key material is not a CryptoKey");
+      }
+      return keyMaterial;
+    }
+
+    // Derive an AES-GCM key from the passphrase and provided salt
+    async function deriveKey(passphrase, salt) {
+      const keyMaterial = await importKey(passphrase);
+      // Ensure salt is a Uint8Array (it should be when decrypting)
+      const derivedKey = await crypto.subtle.deriveKey(
         {
           name: "PBKDF2",
           salt: salt,
           iterations: 100000,
-          hash: "SHA-256",
+          hash: "SHA-256"
         },
         keyMaterial,
         { name: "AES-GCM", length: 256 },
         false,
         ["encrypt", "decrypt"]
       );
+      return derivedKey;
     }
 
-    // Decrypt the given encrypted data (a JSON string) using AES-GCM.
-    function decryptText(encryptedData, password) {
+    // Decrypt the given encryptedData (a JSON string with base64 fields) using the passphrase
+    async function decryptText(encryptedData, passphrase) {
       try {
         const data = JSON.parse(encryptedData);
-        const salt = Uint8Array.from(atob(data.salt), (c) => c.charCodeAt(0));
-        const iv = Uint8Array.from(atob(data.iv), (c) => c.charCodeAt(0));
-        const ciphertext = Uint8Array.from(atob(data.ciphertext), (c) =>
-          c.charCodeAt(0)
-        );
-        const key = deriveKey(password, salt);
-        const decrypted = window.crypto.subtle.decrypt(
+        // Convert base64-encoded values back to Uint8Array
+        const salt = Uint8Array.from(atob(data.salt), c => c.charCodeAt(0));
+        const iv = Uint8Array.from(atob(data.iv), c => c.charCodeAt(0));
+        const ciphertext = Uint8Array.from(atob(data.ciphertext), c => c.charCodeAt(0));
+        const key = await deriveKey(passphrase, salt);
+        const decryptedBuffer = await crypto.subtle.decrypt(
           { name: "AES-GCM", iv: iv },
           key,
           ciphertext
         );
-        const dec = new TextDecoder();
-        return dec.decode(decrypted);
+        return new TextDecoder().decode(decryptedBuffer);
       } catch (error) {
         throw new Error("Decryption error: " + error.message);
       }
     }
 
-    // Initialize passphrase UI and handler.
+    // Initialize passphrase UI and handler
     function initPassphraseHandler() {
       const toggleBtn = document.getElementById("toggle-passphrase");
       const passInput = document.getElementById("passphrase-input");
@@ -1646,50 +1655,51 @@
           toggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
         }
       });
-      document
-        .getElementById("passphrase-submit")
-        .addEventListener("click", async function () {
-          const passphrase = passInput.value.trim();
-          if (!passphrase) {
-            alert("Passphrase is required to decrypt configuration.");
-            return;
+      // Also allow hitting "Enter" to trigger submit
+      passInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          document.getElementById("passphrase-submit").click();
+        }
+      });
+      // On clicking the Unlock button, try to decrypt the YAML
+      document.getElementById("passphrase-submit").addEventListener("click", async function () {
+        const passphrase = passInput.value.trim();
+        if (!passphrase) {
+          alert("Passphrase is required to decrypt configuration.");
+          return;
+        }
+        const encryptedYAML = document.getElementById("custom-config").textContent.trim();
+        let decryptedYAML;
+        try {
+          decryptedYAML = await decryptText(encryptedYAML, passphrase);
+          if (!decryptedYAML) {
+            throw new Error("Empty decryption result. Possibly an incorrect passphrase.");
           }
-          const encryptedYAML = document
-            .getElementById("custom-config")
-            .textContent.trim();
-          let decryptedYAML;
-          try {
-            decryptedYAML = decryptText(encryptedYAML, passphrase);
-            if (!decryptedYAML) {
-              throw new Error(
-                "Empty decryption result. Possibly an incorrect passphrase."
-              );
-            }
-          } catch (error) {
-            alert("Decryption failed: " + error.message);
-            return;
-          }
-          try {
-            const newConfig = jsyaml.load(decryptedYAML);
-            config = newConfig;
-            if (config.page_title) document.title = config.page_title;
-            if (config.cv_timestamp)
-              document.getElementById("cv-timestamp").textContent =
-                "Created: " + config.cv_timestamp;
-            populatePersonalInfo(config.personal_info);
-            populatePositions(config.positions);
-            populateSkills(config.skills);
-            populateAccomplishments(config.accomplishments);
-            updateTranslations();
-            initTimeline();
-            initPositionHover();
-            alert("Configuration unlocked successfully!");
-          } catch (error) {
-            alert("YAML parsing failed: " + error.message);
-            return;
-          }
-        });
+        } catch (error) {
+          alert("Decryption failed: " + error.message);
+          return;
+        }
+        try {
+          const newConfig = jsyaml.load(decryptedYAML);
+          config = newConfig;
+          if (config.page_title) document.title = config.page_title;
+          if (config.cv_timestamp) document.getElementById("cv-timestamp").textContent = "Created: " + config.cv_timestamp;
+          populatePersonalInfo(config.personal_info);
+          populatePositions(config.positions);
+          populateSkills(config.skills);
+          populateAccomplishments(config.accomplishments);
+          updateTranslations();
+          initTimeline();
+          initPositionHover();
+          alert("Configuration unlocked successfully!");
+        } catch (error) {
+          alert("YAML parsing failed: " + error.message);
+          return;
+        }
+      });
     }
+
     function initCV() {
       const defaultText =
         document.getElementById("default-config").textContent;
@@ -1723,14 +1733,6 @@
         showToastSkillFilter("");
       }
     });
-    document
-      .getElementById("passphrase-input")
-      .addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-          event.preventDefault(); // Prevent form submission if inside a form
-          document.getElementById("passphrase-submit").click();
-        }
-      });
     let resizeTimer;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimer);
