@@ -1591,7 +1591,7 @@
     // Derive a key from a password and salt using PBKDF2.
     function deriveKey(password, salt) {
       const enc = new TextEncoder();
-      const keyMaterial = await window.crypto.subtle.importKey(
+      const keyMaterial = window.crypto.subtle.importKey(
         "raw",
         enc.encode(password),
         { name: "PBKDF2" },
@@ -1622,7 +1622,7 @@
           c.charCodeAt(0)
         );
         const key = deriveKey(password, salt);
-        const decrypted = await window.crypto.subtle.decrypt(
+        const decrypted = window.crypto.subtle.decrypt(
           { name: "AES-GCM", iv: iv },
           key,
           ciphertext
