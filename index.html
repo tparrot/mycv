@@ -1,595 +1,588 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Interactive CV"
-    />
-    <title>Loading CV…</title>
 
-    <!-- External resources – for offline usage you can download these locally -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Interactive CV" />
+  <title>Loading CV…</title>
 
-    <!-- We no longer use CryptoJS for encryption; instead we rely on the browser's Web Crypto API -->
-    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <!-- External resources – for offline usage you can download these locally -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- We no longer use CryptoJS for encryption; instead we rely on the browser's Web Crypto API -->
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 
-    <style>
-      /* ==========================================================================
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <style>
+    /* ==========================================================================
        Base Colors, Layout, and Component Styles
        ========================================================================== */
-      :root {
-        --color-bg: #ffffff;
-        --color-bg-hover: #f8f9fa;
-        --color-text: #212529;
-        --color-highlight: #9a9ff7;
-        --color-muted: #6c757d;
-        /* Fallback colors */
-        --default-devops: #b3cde0;
-        --default-linux: #ccebc5;
-        --default-rettung: #fbb4ae;
-        --default-realschule: #ebd9f4;
-        --default-grundschule: #f4e8d9;
-        --color-skill-bubble: #d0d9e2;
-        /* High Contrast Defaults */
-        --hc-bg: #000;
-        --hc-text: #fff;
-        --hc-border: #fff;
-        --hc-toast-bg: #ff0;
-        --hc-toast-text: #000;
-        --hc-highlight: #ff0;
-        --hc-timeline-fill: #00ffff;
-        --hc-position-outline: #ffff00;
-      }
-      body {
-        margin: 0;
-        background: var(--color-bg);
-        color: var(--color-text);
-        font-family: "Helvetica Neue", Arial, sans-serif;
-      }
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-hover: #f8f9fa;
+      --color-text: #212529;
+      --color-highlight: #9a9ff7;
+      --color-muted: #6c757d;
+      /* Fallback colors */
+      --default-devops: #b3cde0;
+      --default-linux: #ccebc5;
+      --default-rettung: #fbb4ae;
+      --default-realschule: #ebd9f4;
+      --default-grundschule: #f4e8d9;
+      --color-skill-bubble: #d0d9e2;
+      /* High Contrast Defaults */
+      --hc-bg: #000;
+      --hc-text: #fff;
+      --hc-border: #fff;
+      --hc-toast-bg: #ff0;
+      --hc-toast-text: #000;
+      --hc-highlight: #ff0;
+      --hc-timeline-fill: #00ffff;
+      --hc-position-outline: #ffff00;
+    }
 
-      /* High Contrast Mode */
-      body.high-contrast {
-        font-size: 1.3rem !important;
-        background-color: var(--hc-bg) !important;
-        color: var(--hc-text) !important;
-      }
-      body.high-contrast #phone-link,
-      body.high-contrast #email-link {
-        font-size: 1.2rem !important;
-      }
-      body.high-contrast h5 {
-        font-size: 1.9rem !important;
-      }
-      body.high-contrast h6,
-      body.high-contrast h7 {
-        font-size: 1.5rem !important;
-      }
-      body.high-contrast .btn,
-      body.high-contrast .btn:hover {
-        border-color: var(--hc-border) !important;
-        color: var(--hc-text) !important;
-        background: none !important;
-        min-width: fit-content;
-      }
-      body.high-contrast .card,
-      body.high-contrast .list-group-item {
-        background: var(--hc-bg) !important;
-        color: var(--hc-text) !important;
-        border-color: var(--hc-border) !important;
-      }
-      body.high-contrast .position-card {
-        border-left-color: var(--hc-position-outline);
-      }
-      body.high-contrast #timeline-svg-container {
-        background: var(--hc-bg) !important;
-        height: 15vh !important;
-      }
-      body.high-contrast #timeline-svg {
-        background: var(--hc-bg) !important;
-      }
-      body.high-contrast #timeline-svg .tick {
-        font-size: 2.5vw !important;
-      }
-      body.high-contrast .timeline-rect {
-        fill: var(--hc-timeline-fill);
-      }
-      body.high-contrast #skill-tree-container {
-        height: auto !important;
-      }
-      body.high-contrast .skill-bubble {
-        /*outline: 4px dashed var(--hc-border) !important;*/
-        border: none !important;
-        background-color: var(--hc-skill-bg) !important;
-        color: var(--hc-text) !important;
-        position: sticky !important;
-        margin: 6px !important;
-        float: left !important;
-        left: 0px !important;
-        top: 0px !important;
-        width: max-content !important;
-      }
-      body.high-contrast #clipboard-toast {
-        outline: 4px solid var(--hc-highlight) !important;
-        background-color: var(--hc-toast-bg) !important;
-        color: var(--hc-toast-text) !important;
-        font-size: 1.3rem !important;
-        font-weight: 600 !important;
-      }
-      body.high-contrast #clipboard-toast .btn-close {
-        background-color: var(--hc-toast-bg) !important;
-      }
-      body.high-contrast .accomplishment-item.hovered,
-      body.high-contrast .skill-bubble.hovered,
-      body.high-contrast .position-card.hovered {
-        outline: 4px dashed var(--hc-highlight) !important;
-      }
-      body.high-contrast .position-card .text-muted,
-      body.high-contrast #skill-tree-legend {
-        color: var(--hc-text) !important;
-      }
-      body.high-contrast .highlighted {
-        background-color: var(--hc-highlight-bg) !important;
-        /* color: var(--hc-highlight) !important; */
-      }
-      body.high-contrast .copyable.btn:hover {
-        background-color: var(--hc-highlight-bg) !important;
-        color: var(--hc-highlight) !important;
-        border-radius: 4px !important;
-      }
-      body.high-contrast .clipboard-btn {
-        font-size: 1.5rem !important;
-        color: var(--hc-highlight) !important;
-        border-radius: 50%;
-        outline: 2px solid var(--hc-border) !important;
-      }
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
 
-      .top-buttons {
-        text-align: right;
-        margin: 1rem;
-      }
-      .top-buttons button {
-        margin-left: 0.5rem;
-        transition: transform 0.1s;
-      }
+    /* High Contrast Mode */
+    body.high-contrast {
+      font-size: 1.3rem !important;
+      background-color: var(--hc-bg) !important;
+      color: var(--hc-text) !important;
+    }
 
-      /* New style for passphrase input group */
-      #passphrase-container {
-        width: auto;
-        display: inline-block;
-        vertical-align: middle;
-        margin-left: 1rem;
-      }
+    body.high-contrast #phone-link,
+    body.high-contrast #email-link {
+      font-size: 1.2rem !important;
+    }
 
-      .passphrase-input {
-        max-width: 300px;
-        min-width: 150px !important;
-        float: left;
-      }
+    body.high-contrast h5 {
+      font-size: 1.9rem !important;
+    }
 
-      #toggle-passphrase,
-      #passphrase-submit {
-        float: left;
-      }
+    body.high-contrast h6,
+    body.high-contrast h7 {
+      font-size: 1.5rem !important;
+    }
 
-      /* Toast Notification */
-      #clipboard-toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1050;
-        display: none;
-      }
+    body.high-contrast .btn,
+    body.high-contrast .btn:hover {
+      border-color: var(--hc-border) !important;
+      color: var(--hc-text) !important;
+      background: none !important;
+      min-width: fit-content;
+    }
 
-      /* Sidebar & Sticky Elements */
+    body.high-contrast .card,
+    body.high-contrast .list-group-item {
+      background: var(--hc-bg) !important;
+      color: var(--hc-text) !important;
+      border-color: var(--hc-border) !important;
+    }
+
+    body.high-contrast .position-card {
+      border-left-color: var(--hc-position-outline);
+    }
+
+    body.high-contrast #timeline-svg-container {
+      background: var(--hc-bg) !important;
+      height: 15vh !important;
+    }
+
+    body.high-contrast #timeline-svg {
+      background: var(--hc-bg) !important;
+    }
+
+    body.high-contrast #timeline-svg .tick {
+      font-size: 2.5vw !important;
+    }
+
+    body.high-contrast .timeline-rect {
+      fill: var(--hc-timeline-fill);
+    }
+
+    body.high-contrast #skill-tree-container {
+      height: auto !important;
+    }
+
+    body.high-contrast .skill-bubble {
+      /*outline: 4px dashed var(--hc-border) !important;*/
+      border: none !important;
+      background-color: var(--hc-skill-bg) !important;
+      color: var(--hc-text) !important;
+      position: sticky !important;
+      margin: 6px !important;
+      float: left !important;
+      left: 0px !important;
+      top: 0px !important;
+      width: max-content !important;
+    }
+
+    body.high-contrast #clipboard-toast {
+      outline: 4px solid var(--hc-highlight) !important;
+      background-color: var(--hc-toast-bg) !important;
+      color: var(--hc-toast-text) !important;
+      font-size: 1.3rem !important;
+      font-weight: 600 !important;
+    }
+
+    body.high-contrast #clipboard-toast .btn-close {
+      background-color: var(--hc-toast-bg) !important;
+    }
+
+    body.high-contrast .accomplishment-item.hovered,
+    body.high-contrast .skill-bubble.hovered,
+    body.high-contrast .position-card.hovered {
+      outline: 4px dashed var(--hc-highlight) !important;
+    }
+
+    body.high-contrast .position-card .text-muted,
+    body.high-contrast #skill-tree-legend {
+      color: var(--hc-text) !important;
+    }
+
+    body.high-contrast .highlighted {
+      background-color: var(--hc-highlight-bg) !important;
+      /* color: var(--hc-highlight) !important; */
+    }
+
+    body.high-contrast .copyable.btn:hover {
+      background-color: var(--hc-highlight-bg) !important;
+      color: var(--hc-highlight) !important;
+      border-radius: 4px !important;
+    }
+
+    body.high-contrast .clipboard-btn {
+      font-size: 1.5rem !important;
+      color: var(--hc-highlight) !important;
+      border-radius: 50%;
+      outline: 2px solid var(--hc-border) !important;
+    }
+
+    .top-buttons {
+      text-align: right;
+      margin: 1rem;
+    }
+
+    .top-buttons button {
+      margin-left: 0.5rem;
+      transition: transform 0.1s;
+    }
+
+    /* New style for passphrase input group */
+    #passphrase-container {
+      width: auto;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 1rem;
+    }
+
+    .passphrase-input {
+      max-width: 300px;
+      min-width: 150px !important;
+      float: left;
+    }
+
+    #toggle-passphrase,
+    #passphrase-submit {
+      float: left;
+    }
+
+    /* Toast Notification */
+    #clipboard-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+      display: none;
+    }
+
+    /* Sidebar & Sticky Elements */
+    aside {
+      top: 0;
+      z-index: 100;
+    }
+
+    @media (min-width: 768px) {
       aside {
-        top: 0;
-        z-index: 100;
-      }
-
-      @media (min-width: 768px) {
-        aside {
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-      }
-      @media (max-width: 767px) {
-        aside {
-          position: static; /* or relative, depending on your layout */
-        }
-      }
-
-      .portrait {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        overflow: hidden;
-        background: var(--color-bg);
-        margin: 0 auto 1rem auto;
-      }
-      .copyable.btn {
-        cursor: pointer;
-        position: relative;
-        text-decoration: none;
-        color: inherit;
-      }
-      .clipboard-btn {
-        font-size: 1rem;
-        cursor: pointer;
-        margin-left: 0.25rem;
-        color: var(--color-muted);
-        transition: transform 0.1s;
-        padding: 4px;
-      }
-      .tooltip-custom {
-        position: absolute;
-        background: var(--color-highlight);
-        color: #fff;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.2s;
-        z-index: 100;
-      }
-      #phone-link,
-      #email-link {
-        max-width: 65%;
-        word-break: break-all;
-      }
-
-      /* Position Cards */
-      .position-card {
-        border-left: 6px solid #ccc;
-        margin-bottom: 1rem;
-        transition: background-color 0.2s;
-      }
-      .position-card:hover {
-        background-color: var(--color-bg-hover);
-      }
-      .list-group-item {
-        background-color: unset !important;
-      }
-
-      .dimmed {
-        opacity: 0.4 !important;
-      }
-      .highlighted {
-        background-color: rgba(0, 0, 0, 0.05) !important;
-      }
-
-      #cv-timestamp {
-        z-index: 100;
-        position: relative;
-      }
-
-      /* Skill Tree */
-      #skill-tree-container {
-        position: relative;
-        height: 400px;
-      }
-      #skill-tree-legend {
-        float: left;
-        width: 100%;
-      }
-      .skill-bubble {
-        position: absolute;
-        border-radius: 16px;
-        padding: 4px 8px;
-        /* background-color: var(--color-skill-bubble);*/
-        color: #000;
-        cursor: pointer;
-        text-align: center;
-        transition: opacity 0.2s, transform 0.2s;
-        user-select: none;
-        font-size: 14px;
-      }
-      .skill-bubble.hovered {
-        outline: 2px solid var(--color-highlight);
-        z-index: 10;
-      }
-      .skill-bubble.selected {
-        border: 2px solid var(--color-highlight);
-        background-color: var(--color-highlight);
-        color: #fff;
-        z-index: 120;
-      }
-
-      /* Timeline */
-      img,
-      svg {
-        overflow: visible !important;
-      }
-      #timeline-svg-container {
-        width: 100%;
-        height: 10vh;
         position: sticky;
         top: 0;
-        z-index: 90;
-        margin-top: 10vh;
-        /*box-shadow: 0 4px 4px -2px rgba(0,0,0,0.3);
+        z-index: 100;
+      }
+    }
+
+    @media (max-width: 767px) {
+      aside {
+        position: static;
+        /* or relative, depending on your layout */
+      }
+    }
+
+    .portrait {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--color-bg);
+      margin: 0 auto 1rem auto;
+    }
+
+    .copyable.btn {
+      cursor: pointer;
+      position: relative;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .clipboard-btn {
+      font-size: 1rem;
+      cursor: pointer;
+      margin-left: 0.25rem;
+      color: var(--color-muted);
+      transition: transform 0.1s;
+      padding: 4px;
+    }
+
+    .tooltip-custom {
+      position: absolute;
+      background: var(--color-highlight);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 100;
+    }
+
+    #phone-link,
+    #email-link {
+      max-width: 65%;
+      word-break: break-all;
+    }
+
+    /* Position Cards */
+    .position-card {
+      border-left: 6px solid #ccc;
+      margin-bottom: 1rem;
+      transition: background-color 0.2s;
+    }
+
+    .position-card:hover {
+      background-color: var(--color-bg-hover);
+    }
+
+    .list-group-item {
+      background-color: unset !important;
+    }
+
+    .dimmed {
+      opacity: 0.4 !important;
+    }
+
+    .highlighted {
+      background-color: rgba(0, 0, 0, 0.05) !important;
+    }
+
+    #cv-timestamp {
+      z-index: 100;
+      position: relative;
+    }
+
+    /* Skill Tree */
+    #skill-tree-container {
+      position: relative;
+      height: 400px;
+    }
+
+    #skill-tree-legend {
+      float: left;
+      width: 100%;
+    }
+
+    .skill-bubble {
+      position: absolute;
+      border-radius: 16px;
+      padding: 4px 8px;
+      /* background-color: var(--color-skill-bubble);*/
+      color: #000;
+      cursor: pointer;
+      text-align: center;
+      transition: opacity 0.2s, transform 0.2s;
+      user-select: none;
+      font-size: 14px;
+    }
+
+    .skill-bubble.hovered {
+      outline: 2px solid var(--color-highlight);
+      z-index: 10;
+    }
+
+    .skill-bubble.selected {
+      border: 2px solid var(--color-highlight);
+      background-color: var(--color-highlight);
+      color: #fff;
+      z-index: 120;
+    }
+
+    /* Timeline */
+    img,
+    svg {
+      overflow: visible !important;
+    }
+
+    #timeline-svg-container {
+      width: 100%;
+      height: 10vh;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      margin-top: 10vh;
+      /*box-shadow: 0 4px 4px -2px rgba(0,0,0,0.3);
       background: var(--color-bg);*/
-        overflow: show;
-      }
-      #timeline-svg {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        top: -20px;
-        overflow-y: visible;
-      }
-      .timeline-rect {
-        cursor: pointer;
-        transition: opacity 0.2s, transform 0.2s;
-        fill-opacity: 0.8;
-      }
-      .timeline-rect:hover {
-        fill-opacity: 1;
+      overflow: show;
+    }
+
+    #timeline-svg {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      top: -20px;
+      overflow-y: visible;
+    }
+
+    .timeline-rect {
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      fill-opacity: 0.8;
+    }
+
+    .timeline-rect:hover {
+      fill-opacity: 1;
+    }
+
+    /* Accomplishments */
+    .accomplishment-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      background: none;
+      border: none;
+      transition: background-color 0.2s;
+    }
+
+    .accomplishment-item:hover {
+      background-color: var(--color-hover);
+    }
+
+    .accomplishment-item.hovered {
+      background-color: var(--color-hover);
+    }
+
+    .clipboard-icon {
+      visibility: hidden;
+      color: var(--color-muted);
+      font-size: 1rem;
+      margin-left: 0.5rem;
+      transition: transform 0.1s;
+    }
+
+    .accomplishment-item:hover .clipboard-icon {
+      visibility: visible;
+    }
+
+    .accomplishment-item:active .clipboard-icon {
+      transform: scale(0.95);
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        font-size: 11pt;
+        margin: 0.5cm;
       }
 
-      /* Accomplishments */
-      .accomplishment-item {
-        position: relative;
-        display: flex;
+      .top-buttons,
+      #clipboard-toast,
+      .bi.btn,
+      .accomplishment-item>.btn,
+      .clipboard-btn {
+        display: none !important;
+      }
+
+      .container {
+        width: 210mm;
+        overflow: visible !important;
+      }
+
+      /* Force a desktop layout (side-by-side) */
+      .row {
+        display: flex !important;
+        flex-direction: row !important;
+      }
+
+      aside,
+      main {
+        width: 50% !important;
+      }
+
+      /* For print, force the skill tree into a flex layout so skills appear side by side */
+      #skill-tree-container {
+        display: flex !important;
+        flex-wrap: wrap !important;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.25rem;
-        padding: 0.25rem 0.5rem;
-        background: none;
+        justify-content: flex-start;
+        height: auto !important;
         border: none;
-        transition: background-color 0.2s;
-      }
-      .accomplishment-item:hover {
-        background-color: var(--color-hover);
-      }
-      .accomplishment-item.hovered {
-        background-color: var(--color-hover);
-      }
-      .clipboard-icon {
-        visibility: hidden;
-        color: var(--color-muted);
-        font-size: 1rem;
-        margin-left: 0.5rem;
-        transition: transform 0.1s;
-      }
-      .accomplishment-item:hover .clipboard-icon {
-        visibility: visible;
-      }
-      .accomplishment-item:active .clipboard-icon {
-        transform: scale(0.95);
       }
 
-      /* Print Styles */
-      @media print {
-        body {
-          font-size: 11pt;
-          margin: 0.5cm;
-        }
-        .top-buttons,
-        #clipboard-toast,
-        .bi.btn,
-        .accomplishment-item > .btn,
-        .clipboard-btn {
-          display: none !important;
-        }
-        .container {
-          width: 210mm;
-          overflow: visible !important;
-        }
-        /* Force a desktop layout (side-by-side) */
-        .row {
-          display: flex !important;
-          flex-direction: row !important;
-        }
-        aside,
-        main {
-          width: 50% !important;
-        }
-        /* For print, force the skill tree into a flex layout so skills appear side by side */
-        #skill-tree-container {
-          display: flex !important;
-          flex-wrap: wrap !important;
-          align-items: center;
-          justify-content: flex-start;
-          height: auto !important;
-          border: none;
-        }
-        .skill-bubble {
-          margin: 2px;
-          position: static !important;
-          transform: none !important;
-          outline: none !important;
-        }
-        /* Timeline SVG: scale to fit DIN A4 width */
-        #timeline-svg-container {
-          display: none !important;
-        }
-        /* Remove extra margins */
-        .container,
-        .row,
-        aside,
-        main {
-          margin: 0;
-          padding: 0;
-        }
+      .skill-bubble {
+        margin: 2px;
+        position: static !important;
+        transform: none !important;
+        outline: none !important;
       }
-    </style>
-  </head>
-  <body>
-    <!-- Top Buttons (including the new passphrase input group) -->
-    <div class="top-buttons">
-      <button
-        id="lang-toggle"
-        class="btn btn-outline-primary"
-        onclick="toggleLanguage()"
-      >
-        Switch to German
+
+      /* Timeline SVG: scale to fit DIN A4 width */
+      #timeline-svg-container {
+        display: none !important;
+      }
+
+      /* Remove extra margins */
+      .container,
+      .row,
+      aside,
+      main {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top Buttons (including the new passphrase input group) -->
+  <div class="top-buttons">
+    <button id="lang-toggle" class="btn btn-outline-primary" onclick="toggleLanguage()">
+      Switch to German
+    </button>
+    <button id="contrast-toggle" class="btn btn-outline-primary" onclick="toggleContrast()">
+      Toggle Accessibility
+    </button>
+    <button id="print-btn" class="btn btn-outline-primary" onclick="window.print()">
+      Print
+    </button>
+    <!-- Passphrase Unlock UI -->
+    <div id="passphrase-container" class="input-group">
+      <input type="password" id="passphrase-input" class="form-control passphrase-input"
+        placeholder="Enter passphrase" />
+      <button id="toggle-passphrase" class="btn btn-outline-secondary" type="button">
+        <i class="bi bi-eye"></i>
       </button>
-      <button
-        id="contrast-toggle"
-        class="btn btn-outline-primary"
-        onclick="toggleContrast()"
-      >
-        Toggle Accessibility
+      <button id="passphrase-submit" class="btn btn-primary" type="button">
+        Unlock
       </button>
-      <button
-        id="print-btn"
-        class="btn btn-outline-primary"
-        onclick="window.print()"
-      >
-        Print
-      </button>
-      <!-- Passphrase Unlock UI -->
-      <div id="passphrase-container" class="input-group">
-        <input
-          type="password"
-          id="passphrase-input"
-          class="form-control passphrase-input"
-          placeholder="Enter passphrase"
-        />
-        <button
-          id="toggle-passphrase"
-          class="btn btn-outline-secondary"
-          type="button"
-        >
-          <i class="bi bi-eye"></i>
-        </button>
-        <button id="passphrase-submit" class="btn btn-primary" type="button">
-          Unlock
-        </button>
-      </div>
     </div>
+  </div>
 
-    <!-- Toast Notification -->
-    <div
-      id="clipboard-toast"
-      class="toast align-items-center text-bg-success border-0"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
-      <div class="d-flex">
-        <div class="toast-body" id="clipboard-toast-text">
-          Copied to clipboard
+  <!-- Toast Notification -->
+  <div id="clipboard-toast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive"
+    aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="clipboard-toast-text">
+        Copied to clipboard
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto"></button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <div id="cv-timestamp" class="text-end small mb-2"></div>
+    <div class="row g-3">
+      <!-- LEFT SIDEBAR: Personal Info, Skill Tree, Certificates -->
+      <aside class="col-md-4">
+        <!-- Personal Info Card -->
+        <div class="card mb-3">
+          <div class="card-body text-center">
+            <div class="portrait">
+              <img id="portrait-image" alt="Portrait Picture" style="width: 100%; height: 100%" />
+            </div>
+            <h2 class="card-title h4">
+              <span class="copyable" data-copy="" data-i18n="name"></span>
+              <i class="bi bi-clipboard clipboard-btn"></i>
+            </h2>
+            <p class="card-text" data-i18n="title"></p>
+            <p>
+              <i class="bi bi-geo-alt"></i>
+              <span data-i18n="birthplace"></span>
+            </p>
+            <p>
+              <i class="bi bi-calendar-event"></i>
+              <span data-i18n="dob"></span>
+            </p>
+            <p>
+              <i class="bi bi-telephone"></i>
+              <a href="#" id="phone-link" class="copyable btn btn-light btn-sm" data-copy="" data-i18n="phone"></a>
+              <i class="bi bi-clipboard clipboard-btn"></i>
+            </p>
+            <p>
+              <i class="bi bi-envelope"></i>
+              <a href="#" id="email-link" class="copyable btn btn-light btn-sm" data-copy="" data-i18n="email"></a>
+              <i class="bi bi-clipboard clipboard-btn"></i>
+            </p>
+            <p>
+              <i class="bi bi-globe"></i>
+              <span data-i18n="languages"></span>
+            </p>
+          </div>
         </div>
-        <button
-          type="button"
-          class="btn-close btn-close-white me-2 m-auto"
-        ></button>
-      </div>
+        <!-- Skill Tree Card -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="text-center" data-i18n="skills">Skill Mix</h5>
+            <div id="skill-tree-container"></div>
+            <p id="skill-tree-legend" class="text-center text-muted small mt-2" data-i18n="skills_legend">
+              Larger skill tags indicate higher expertise.
+            </p>
+          </div>
+        </div>
+        <!-- Certificates & Accomplishments Card -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="text-center">Certificates &amp; Accomplishments</h5>
+            <div id="accomplishments-list" class="mt-2"></div>
+          </div>
+        </div>
+      </aside>
+      <!-- RIGHT COLUMN: Timeline & Positions -->
+      <main class="col-md-8" style="overflow-y: auto; min-height: calc(100vh - 60px)">
+        <div id="timeline-card" class="mb-2">
+          <h5 class="text-center" data-i18n="timeline">Visual Timeline</h5>
+          <div id="timeline-svg-container">
+            <svg id="timeline-svg"></svg>
+          </div>
+        </div>
+        <div id="position-list"></div>
+      </main>
     </div>
+    <!-- Extra Content Container (if needed) -->
+    <div id="extra-content-container" class="mt-3"></div>
+  </div>
 
-    <!-- Main Container -->
-    <div class="container">
-      <div id="cv-timestamp" class="text-end small mb-2"></div>
-      <div class="row g-3">
-        <!-- LEFT SIDEBAR: Personal Info, Skill Tree, Certificates -->
-        <aside class="col-md-4">
-          <!-- Personal Info Card -->
-          <div class="card mb-3">
-            <div class="card-body text-center">
-              <div class="portrait">
-                <img
-                  id="portrait-image"
-                  alt="Portrait Picture"
-                  style="width: 100%; height: 100%"
-                />
-              </div>
-              <h2 class="card-title h4">
-                <span class="copyable" data-copy="" data-i18n="name"></span>
-                <i class="bi bi-clipboard clipboard-btn"></i>
-              </h2>
-              <p class="card-text" data-i18n="title"></p>
-              <p>
-                <i class="bi bi-geo-alt"></i>
-                <span data-i18n="birthplace"></span>
-              </p>
-              <p>
-                <i class="bi bi-calendar-event"></i>
-                <span data-i18n="dob"></span>
-              </p>
-              <p>
-                <i class="bi bi-telephone"></i>
-                <a
-                  href="#"
-                  id="phone-link"
-                  class="copyable btn btn-light btn-sm"
-                  data-copy=""
-                  data-i18n="phone"></a
-                >
-                <i class="bi bi-clipboard clipboard-btn"></i>
-              </p>
-              <p>
-                <i class="bi bi-envelope"></i>
-                <a
-                  href="#"
-                  id="email-link"
-                  class="copyable btn btn-light btn-sm"
-                  data-copy=""
-                  data-i18n="email"></a
-                >
-                <i class="bi bi-clipboard clipboard-btn"></i>
-              </p>
-              <p>
-                <i class="bi bi-globe"></i>
-                <span data-i18n="languages"></span>
-              </p>
-            </div>
-          </div>
-          <!-- Skill Tree Card -->
-          <div class="card mb-3">
-            <div class="card-body">
-              <h5 class="text-center" data-i18n="skills">Skill Mix</h5>
-              <div id="skill-tree-container"></div>
-              <p
-                id="skill-tree-legend"
-                class="text-center text-muted small mt-2"
-                data-i18n="skills_legend"
-              >
-                Larger skill tags indicate higher expertise.
-              </p>
-            </div>
-          </div>
-          <!-- Certificates & Accomplishments Card -->
-          <div class="card">
-            <div class="card-body">
-              <h5 class="text-center">Certificates &amp; Accomplishments</h5>
-              <div id="accomplishments-list" class="mt-2"></div>
-            </div>
-          </div>
-        </aside>
-        <!-- RIGHT COLUMN: Timeline & Positions -->
-        <main
-          class="col-md-8"
-          style="overflow-y: auto; min-height: calc(100vh - 60px)"
-        >
-          <div id="timeline-card" class="mb-2">
-            <h5 class="text-center" data-i18n="timeline">Visual Timeline</h5>
-            <div id="timeline-svg-container">
-              <svg id="timeline-svg"></svg>
-            </div>
-          </div>
-          <div id="position-list"></div>
-        </main>
-      </div>
-      <!-- Extra Content Container (if needed) -->
-      <div id="extra-content-container" class="mt-3"></div>
-    </div>
-
-    <!-- Embedded Default YAML Configuration -->
-    <script id="default-config" type="text/x-yaml">
+  <!-- Embedded Default YAML Configuration -->
+  <script id="default-config" type="text/x-yaml">
       page_title: "DevOps Engineer CV for John Doe"
       cv_timestamp: "2025-03-13"
       personal_info:
@@ -759,990 +752,996 @@
           skill_filter_toast: "Zeige Positionen mit {skill}"
           skill_filter_clear_toast: "Skillfilter entfernt"
     </script>
-    <script id="custom-config" type="text/plain">
-{"salt":"gyZ8MiFGKrye0ziUvSe1RQ==","iv":"tjhcQUbD8eN+cMoM","ciphertext":"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"}
+  <script id="custom-config" type="text/plain">
+      {"salt":"gyZ8MiFGKrye0ziUvSe1RQ==","iv":"tjhcQUbD8eN+cMoM","ciphertext":"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"}
     </script>
-    <!-- Main JavaScript -->
-    <script>
-      /*<![CDATA[*/
-      function hexToRgb(hex) {
-        hex = hex.replace(/^#/, "");
-        if (hex.length === 3)
-          hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-        if (hex.length !== 6) return null;
-        return {
-          r: parseInt(hex.substring(0, 2), 16),
-          g: parseInt(hex.substring(2, 4), 16),
-          b: parseInt(hex.substring(4, 6), 16),
-        };
+  <!-- Main JavaScript -->
+  <script>
+    /*<![CDATA[*/
+    function hexToRgb(hex) {
+      hex = hex.replace(/^#/, "");
+      if (hex.length === 3)
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      if (hex.length !== 6) return null;
+      return {
+        r: parseInt(hex.substring(0, 2), 16),
+        g: parseInt(hex.substring(2, 4), 16),
+        b: parseInt(hex.substring(4, 6), 16),
+      };
+    }
+    function rgbToHex(r, g, b) {
+      const toHex = (c) => ("0" + c.toString(16)).slice(-2);
+      return "#" + toHex(r) + toHex(g) + toHex(b);
+    }
+    function generateHCColor(hex) {
+      const rgb = hexToRgb(hex);
+      if (!rgb) return "#FFFF00";
+      let channels = [
+        { key: "r", value: rgb.r },
+        { key: "g", value: rgb.g },
+        { key: "b", value: rgb.b },
+      ].sort((a, b) => b.value - a.value);
+      rgb[channels[0].key] = Math.min(
+        255,
+        Math.floor(rgb[channels[0].key] * 5)
+      );
+      rgb[channels[1].key] = Math.min(
+        255,
+        Math.floor(rgb[channels[1].key] * 2)
+      );
+      rgb[channels[2].key] = Math.min(
+        255,
+        Math.floor(rgb[channels[2].key] / 5)
+      );
+      return rgbToHex(rgb.r, rgb.g, rgb.b);
+    }
+    function getDefaultColor(id) {
+      const palette = [
+        "#b3cde0",
+        "#ccebc5",
+        "#fbb4ae",
+        "#ebd9f4",
+        "#f4e8d9",
+        "#D0D9E2",
+        "#C3C2D5",
+      ];
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
       }
-      function rgbToHex(r, g, b) {
-        const toHex = (c) => ("0" + c.toString(16)).slice(-2);
-        return "#" + toHex(r) + toHex(g) + toHex(b);
+      const index = Math.abs(hash) % palette.length;
+      return palette[index];
+    }
+    function getPositionColor(id) {
+      const pos = config.positions.find((p) => p.id === id);
+      let normal = pos && pos.color ? pos.color : getDefaultColor(id);
+      let highContrast =
+        pos && pos.highContrastColor
+          ? pos.highContrastColor
+          : generateHCColor(normal);
+      return { normal, highContrast };
+    }
+    function renderContent(content) {
+      if (typeof content === "string") {
+        const p = document.createElement("p");
+        p.innerHTML = content.replace(/\n/g, "<br>");
+        return p;
       }
-      function generateHCColor(hex) {
-        const rgb = hexToRgb(hex);
-        if (!rgb) return "#FFFF00";
-        let channels = [
-          { key: "r", value: rgb.r },
-          { key: "g", value: rgb.g },
-          { key: "b", value: rgb.b },
-        ].sort((a, b) => b.value - a.value);
-        rgb[channels[0].key] = Math.min(
-          255,
-          Math.floor(rgb[channels[0].key] * 5)
-        );
-        rgb[channels[1].key] = Math.min(
-          255,
-          Math.floor(rgb[channels[1].key] * 2)
-        );
-        rgb[channels[2].key] = Math.min(
-          255,
-          Math.floor(rgb[channels[2].key] / 5)
-        );
-        return rgbToHex(rgb.r, rgb.g, rgb.b);
+      if (Array.isArray(content)) {
+        const fragment = document.createDocumentFragment();
+        content.forEach((item) => {
+          fragment.appendChild(renderContent(item));
+        });
+        return fragment;
       }
-      function getDefaultColor(id) {
-        const palette = [
-          "#b3cde0",
-          "#ccebc5",
-          "#fbb4ae",
-          "#ebd9f4",
-          "#f4e8d9",
-          "#D0D9E2",
-          "#C3C2D5",
-        ];
-        let hash = 0;
-        for (let i = 0; i < id.length; i++) {
-          hash = id.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        const index = Math.abs(hash) % palette.length;
-        return palette[index];
-      }
-      function getPositionColor(id) {
-        const pos = config.positions.find((p) => p.id === id);
-        let normal = pos && pos.color ? pos.color : getDefaultColor(id);
-        let highContrast =
-          pos && pos.highContrastColor
-            ? pos.highContrastColor
-            : generateHCColor(normal);
-        return { normal, highContrast };
-      }
-      function renderContent(content) {
-        if (typeof content === "string") {
+      if (typeof content === "object" && content !== null) {
+        if (content.type === "paragraph") {
           const p = document.createElement("p");
-          p.innerHTML = content.replace(/\n/g, "<br>");
+          p.innerHTML = content.text
+            ? content.text.replace(/\n/g, "<br>")
+            : "";
+          return p;
+        } else if (content.type === "list") {
+          const ul = document.createElement("ul");
+          ul.className = "list-group list-group-flush";
+          if (Array.isArray(content.items)) {
+            content.items.forEach((item) => {
+              const li = document.createElement("li");
+              li.className = "list-group-item";
+              li.appendChild(renderContent(item));
+              ul.appendChild(li);
+            });
+          }
+          return ul;
+        } else {
+          const p = document.createElement("p");
+          p.innerHTML = content.text
+            ? content.text.replace(/\n/g, "<br>")
+            : "";
           return p;
         }
-        if (Array.isArray(content)) {
-          const fragment = document.createDocumentFragment();
-          content.forEach((item) => {
-            fragment.appendChild(renderContent(item));
-          });
-          return fragment;
+      }
+      return document.createElement("div");
+    }
+    function showToastSkillFilter(skillName) {
+      const toastEl = document.getElementById("clipboard-toast");
+      const toastText = document.getElementById("clipboard-toast-text");
+      if (skillName) {
+        let msgTemplate =
+          config.translations[currentLanguage].skill_filter_toast ||
+          "Showing positions with skill: {skill}";
+        toastText.textContent = msgTemplate.replace("{skill}", skillName);
+      } else {
+        let msg =
+          config.translations[currentLanguage].skill_filter_clear_toast ||
+          "Skill filter removed";
+        toastText.textContent = msg;
+      }
+      toastEl.style.display = "block";
+      setTimeout(() => {
+        toastEl.style.display = "none";
+      }, 2000);
+    }
+    function updateTranslations() {
+      const trans = config.translations;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (trans[currentLanguage] && trans[currentLanguage][key]) {
+          el.textContent = trans[currentLanguage][key];
         }
-        if (typeof content === "object" && content !== null) {
-          if (content.type === "paragraph") {
-            const p = document.createElement("p");
-            p.innerHTML = content.text
-              ? content.text.replace(/\n/g, "<br>")
-              : "";
-            return p;
-          } else if (content.type === "list") {
-            const ul = document.createElement("ul");
-            ul.className = "list-group list-group-flush";
-            if (Array.isArray(content.items)) {
-              content.items.forEach((item) => {
-                const li = document.createElement("li");
-                li.className = "list-group-item";
-                li.appendChild(renderContent(item));
-                ul.appendChild(li);
-              });
-            }
-            return ul;
-          } else {
-            const p = document.createElement("p");
-            p.innerHTML = content.text
-              ? content.text.replace(/\n/g, "<br>")
-              : "";
-            return p;
+      });
+      document.getElementById("lang-toggle").textContent =
+        currentLanguage === "en" ? "Switch to German" : "Switch to English";
+      const emailLink = document.getElementById("email-link");
+      if (emailLink) {
+        emailLink.title =
+          currentLanguage === "en"
+            ? config.personal_info.email_tooltip_en
+            : config.personal_info.email_tooltip_de;
+      }
+      const phoneLink = document.getElementById("phone-link");
+      if (phoneLink) {
+        phoneLink.title =
+          currentLanguage === "en"
+            ? config.personal_info.phone_tooltip_en
+            : config.personal_info.phone_tooltip_de;
+      }
+      document.querySelectorAll(".position-card").forEach((card) => {
+        const pid = card.getAttribute("data-id");
+        const pos = config.positions.find((p) => p.id === pid);
+        if (pos && pos.translations && pos.translations[currentLanguage]) {
+          const t = pos.translations[currentLanguage];
+          card.querySelector("h5").textContent = t.title || pos.title;
+          card.querySelector("h6").textContent = t.company || pos.company;
+          let descContainer = card.querySelector(".position-description");
+          if (!descContainer) {
+            descContainer = document.createElement("div");
+            descContainer.classList.add("position-description");
+            card.appendChild(descContainer);
           }
-        }
-        return document.createElement("div");
-      }
-      function showToastSkillFilter(skillName) {
-        const toastEl = document.getElementById("clipboard-toast");
-        const toastText = document.getElementById("clipboard-toast-text");
-        if (skillName) {
-          let msgTemplate =
-            config.translations[currentLanguage].skill_filter_toast ||
-            "Showing positions with skill: {skill}";
-          toastText.textContent = msgTemplate.replace("{skill}", skillName);
-        } else {
-          let msg =
-            config.translations[currentLanguage].skill_filter_clear_toast ||
-            "Skill filter removed";
-          toastText.textContent = msg;
-        }
-        toastEl.style.display = "block";
-        setTimeout(() => {
-          toastEl.style.display = "none";
-        }, 2000);
-      }
-      function updateTranslations() {
-        const trans = config.translations;
-        document.querySelectorAll("[data-i18n]").forEach((el) => {
-          const key = el.getAttribute("data-i18n");
-          if (trans[currentLanguage] && trans[currentLanguage][key]) {
-            el.textContent = trans[currentLanguage][key];
-          }
-        });
-        document.getElementById("lang-toggle").textContent =
-          currentLanguage === "en" ? "Switch to German" : "Switch to English";
-        const emailLink = document.getElementById("email-link");
-        if (emailLink) {
-          emailLink.title =
-            currentLanguage === "en"
-              ? config.personal_info.email_tooltip_en
-              : config.personal_info.email_tooltip_de;
-        }
-        const phoneLink = document.getElementById("phone-link");
-        if (phoneLink) {
-          phoneLink.title =
-            currentLanguage === "en"
-              ? config.personal_info.phone_tooltip_en
-              : config.personal_info.phone_tooltip_de;
-        }
-        document.querySelectorAll(".position-card").forEach((card) => {
-          const pid = card.getAttribute("data-id");
-          const pos = config.positions.find((p) => p.id === pid);
-          if (pos && pos.translations && pos.translations[currentLanguage]) {
-            const t = pos.translations[currentLanguage];
-            card.querySelector("h5").textContent = t.title || pos.title;
-            card.querySelector("h6").textContent = t.company || pos.company;
-            let descContainer = card.querySelector(".position-description");
-            if (!descContainer) {
-              descContainer = document.createElement("div");
-              descContainer.classList.add("position-description");
-              card.appendChild(descContainer);
-            }
-            descContainer.innerHTML = "";
-            if (t.description || pos.description) {
-              descContainer.appendChild(
-                renderContent(t.description || pos.description)
-              );
-            }
-          }
-        });
-        d3.selectAll(".skill-bubble").each(function (d) {
-          if (
-            d.translations &&
-            d.translations[currentLanguage] &&
-            d.translations[currentLanguage].title
-          ) {
-            d3.select(this).text(d.translations[currentLanguage].title);
-          } else {
-            d3.select(this).text(d.id);
-          }
-        });
-        document.querySelectorAll(".accomplishment-item").forEach((item) => {
-          const accData = item.dataset.acc
-            ? JSON.parse(item.dataset.acc)
-            : null;
-          if (
-            accData &&
-            accData.translations &&
-            accData.translations[currentLanguage] &&
-            accData.translations[currentLanguage].label
-          ) {
-            const span = item.querySelector("span");
-            if (span)
-              span.textContent = accData.translations[currentLanguage].label;
-          }
-        });
-        document
-          .querySelectorAll(".position-badges span.badge")
-          .forEach((badge) => {
-            let skillId =
-              badge.getAttribute("data-skill") || badge.textContent.trim();
-            const skillObj = config.skills.find((s) => s.id === skillId);
-            if (
-              skillObj &&
-              skillObj.translations &&
-              skillObj.translations[currentLanguage] &&
-              skillObj.translations[currentLanguage].title
-            ) {
-              badge.textContent = skillObj.translations[currentLanguage].title;
-            } else {
-              badge.textContent = skillId;
-            }
-          });
-      }
-      function toggleLanguage() {
-        currentLanguage = currentLanguage === "en" ? "de" : "en";
-        updateTranslations();
-      }
-      function updateColors() {
-        document.querySelectorAll(".position-card").forEach((card) => {
-          const { normal, highContrast } = getPositionColor(
-            card.getAttribute("data-id")
-          );
-          card.style.setProperty(
-            "border-left-color",
-            document.body.classList.contains("high-contrast")
-              ? highContrast
-              : normal,
-            "important"
-          );
-        });
-        applyTimelineColors();
-      }
-      function toggleContrast() {
-        document.body.classList.toggle("high-contrast");
-        updateColors();
-      }
-      function populatePersonalInfo(info) {
-        const nameEl = document.querySelector('[data-i18n="name"]');
-        if (nameEl) {
-          nameEl.textContent = info.name;
-          nameEl.setAttribute("data-copy", info.name);
-        }
-        const titleEl = document.querySelector('[data-i18n="title"]');
-        if (titleEl) titleEl.textContent = info.title;
-        const birthEl = document.querySelector('[data-i18n="birthplace"]');
-        if (birthEl) birthEl.textContent = info.birthplace;
-        const dobEl = document.querySelector('[data-i18n="dob"]');
-        if (dobEl) dobEl.textContent = info.dob;
-        const phoneEl = document.querySelector('[data-i18n="phone"]');
-        if (phoneEl) {
-          phoneEl.textContent = info.phone;
-          phoneEl.setAttribute("data-copy", info.phone);
-        }
-        const langEl = document.querySelector('[data-i18n="languages"]');
-        if (langEl) langEl.textContent = info.languages;
-        const emailElem = document.querySelector('[data-i18n="email"]');
-        if (emailElem) {
-          emailElem.textContent = info.email;
-          emailElem.setAttribute("data-copy", info.email);
-        }
-        const emailLink = document.getElementById("email-link");
-        if (emailLink) emailLink.href = `mailto:"${info.name}"<${info.email}>`;
-        const phoneLink = document.getElementById("phone-link");
-        if (phoneLink)
-          phoneLink.href = "tel:" + info.phone.replace(/[^0-9+]/g, "");
-
-        getProfileImage(info.email, info.image).then(profileImageSrc => {
-          const imgElement = document.getElementById("portrait-image");
-          if (imgElement) imgElement.src = profileImageSrc;
-        });
-      }
-      function populatePositions(positions) {
-        const container = document.getElementById("position-list");
-        container.innerHTML = "";
-        positions.forEach((pos) => {
-          const card = document.createElement("div");
-          card.classList.add("card", "position-card", "p-3");
-          card.setAttribute("data-id", pos.id);
-          card.setAttribute("data-start", pos.start);
-          card.setAttribute("data-end", pos.end);
-          card.setAttribute("data-company", pos.company);
-          card.setAttribute("data-skills", (pos.skills || []).join(","));
-          const { normal, highContrast } = getPositionColor(pos.id);
-          card.style.setProperty(
-            "border-left-color",
-            document.body.classList.contains("high-contrast")
-              ? highContrast
-              : normal,
-            "important"
-          );
-          const t =
-            pos.translations && pos.translations[currentLanguage]
-              ? pos.translations[currentLanguage]
-              : {};
-          const title = t.title || pos.title || pos.id;
-          card.innerHTML = `<h5 class="card-title mb-1">${title}</h5>
-      <h6 class="card-subtitle mb-1 text-muted company">${pos.company}</h6>
-      <h7 class="card-subtitle mb-2 text-muted date"><span class="start-date">${pos.start}</span> – <span class="end-date">${pos.end}</span></h7>`;
-          const descContainer = document.createElement("div");
-          descContainer.classList.add("position-description", "card-text");
+          descContainer.innerHTML = "";
           if (t.description || pos.description) {
             descContainer.appendChild(
               renderContent(t.description || pos.description)
             );
           }
-          card.appendChild(descContainer);
-          if (pos.skills && pos.skills.length > 0) {
-            const badgeContainer = document.createElement("div");
-            badgeContainer.classList.add("position-badges");
-            pos.skills.forEach((skill) => {
-              const badge = document.createElement("span");
-              badge.classList.add("badge", "bg-secondary", "ms-1");
-              badge.setAttribute("data-skill", skill);
-              badge.textContent = skill;
-              badge.style.cursor = "pointer";
-              badge.addEventListener("click", function (event) {
-                event.stopPropagation();
-                if (selectedSkill === skill) {
-                  selectedSkill = null;
-                  d3.selectAll(".skill-bubble").classed("selected", false);
-                  document
-                    .querySelectorAll(".position-card")
-                    .forEach((card) => {
-                      card.classList.remove("dimmed", "highlighted");
-                    });
-                  showToastSkillFilter("");
-                } else {
-                  selectedSkill = skill;
-                  d3.selectAll(".skill-bubble").classed("selected", false);
-                  d3.selectAll(".skill-bubble")
-                    .filter(function (d) {
-                      return d.id === skill;
-                    })
-                    .classed("selected", true);
-                  document
-                    .querySelectorAll(".position-card")
-                    .forEach((card) => {
-                      const skills = card
-                        .getAttribute("data-skills")
-                        .split(",")
-                        .map((s) => s.trim());
-                      if (skills.includes(skill)) {
-                        card.classList.add("highlighted");
-                        card.classList.remove("dimmed");
-                      } else {
-                        card.classList.add("dimmed");
-                      }
-                    });
-                  let skillName = skill;
-                  d3.selectAll(".skill-bubble").each(function (d) {
-                    if (
-                      d.id === skill &&
-                      d.translations &&
-                      d.translations[currentLanguage] &&
-                      d.translations[currentLanguage].title
-                    ) {
-                      skillName = d.translations[currentLanguage].title;
+        }
+      });
+      d3.selectAll(".skill-bubble").each(function (d) {
+        if (
+          d.translations &&
+          d.translations[currentLanguage] &&
+          d.translations[currentLanguage].title
+        ) {
+          d3.select(this).text(d.translations[currentLanguage].title);
+        } else {
+          d3.select(this).text(d.id);
+        }
+      });
+      document.querySelectorAll(".accomplishment-item").forEach((item) => {
+        const accData = item.dataset.acc
+          ? JSON.parse(item.dataset.acc)
+          : null;
+        if (
+          accData &&
+          accData.translations &&
+          accData.translations[currentLanguage] &&
+          accData.translations[currentLanguage].label
+        ) {
+          const span = item.querySelector("span");
+          if (span)
+            span.textContent = accData.translations[currentLanguage].label;
+        }
+      });
+      document
+        .querySelectorAll(".position-badges span.badge")
+        .forEach((badge) => {
+          let skillId =
+            badge.getAttribute("data-skill") || badge.textContent.trim();
+          const skillObj = config.skills.find((s) => s.id === skillId);
+          if (
+            skillObj &&
+            skillObj.translations &&
+            skillObj.translations[currentLanguage] &&
+            skillObj.translations[currentLanguage].title
+          ) {
+            badge.textContent = skillObj.translations[currentLanguage].title;
+          } else {
+            badge.textContent = skillId;
+          }
+        });
+    }
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === "en" ? "de" : "en";
+      updateTranslations();
+    }
+    function updateColors() {
+      document.querySelectorAll(".position-card").forEach((card) => {
+        const { normal, highContrast } = getPositionColor(
+          card.getAttribute("data-id")
+        );
+        card.style.setProperty(
+          "border-left-color",
+          document.body.classList.contains("high-contrast")
+            ? highContrast
+            : normal,
+          "important"
+        );
+      });
+      applyTimelineColors();
+    }
+    function toggleContrast() {
+      document.body.classList.toggle("high-contrast");
+      updateColors();
+    }
+    function populatePersonalInfo(info) {
+      const nameEl = document.querySelector('[data-i18n="name"]');
+      if (nameEl) {
+        nameEl.textContent = info.name;
+        nameEl.setAttribute("data-copy", info.name);
+      }
+      const titleEl = document.querySelector('[data-i18n="title"]');
+      if (titleEl) titleEl.textContent = info.title;
+      const birthEl = document.querySelector('[data-i18n="birthplace"]');
+      if (birthEl) birthEl.textContent = info.birthplace;
+      const dobEl = document.querySelector('[data-i18n="dob"]');
+      if (dobEl) dobEl.textContent = info.dob;
+      const phoneEl = document.querySelector('[data-i18n="phone"]');
+      if (phoneEl) {
+        phoneEl.textContent = info.phone;
+        phoneEl.setAttribute("data-copy", info.phone);
+      }
+      const langEl = document.querySelector('[data-i18n="languages"]');
+      if (langEl) langEl.textContent = info.languages;
+      const emailElem = document.querySelector('[data-i18n="email"]');
+      if (emailElem) {
+        emailElem.textContent = info.email;
+        emailElem.setAttribute("data-copy", info.email);
+      }
+      const emailLink = document.getElementById("email-link");
+      if (emailLink) emailLink.href = `mailto:"${info.name}"<${info.email}>`;
+      const phoneLink = document.getElementById("phone-link");
+      if (phoneLink)
+        phoneLink.href = "tel:" + info.phone.replace(/[^0-9+]/g, "");
+
+      getProfileImage(info.email, info.image).then((profileImageSrc) => {
+        const imgElement = document.getElementById("portrait-image");
+        if (imgElement) imgElement.src = profileImageSrc;
+      });
+    }
+    function populatePositions(positions) {
+      const container = document.getElementById("position-list");
+      container.innerHTML = "";
+      positions.forEach((pos) => {
+        const card = document.createElement("div");
+        card.classList.add("card", "position-card", "p-3");
+        card.setAttribute("data-id", pos.id);
+        card.setAttribute("data-start", pos.start);
+        card.setAttribute("data-end", pos.end);
+        card.setAttribute("data-company", pos.company);
+        card.setAttribute("data-skills", (pos.skills || []).join(","));
+        const { normal, highContrast } = getPositionColor(pos.id);
+        card.style.setProperty(
+          "border-left-color",
+          document.body.classList.contains("high-contrast")
+            ? highContrast
+            : normal,
+          "important"
+        );
+        const t =
+          pos.translations && pos.translations[currentLanguage]
+            ? pos.translations[currentLanguage]
+            : {};
+        const title = t.title || pos.title || pos.id;
+        card.innerHTML = `<h5 class="card-title mb-1">${title}</h5>
+      <h6 class="card-subtitle mb-1 text-muted company">${pos.company}</h6>
+      <h7 class="card-subtitle mb-2 text-muted date"><span class="start-date">${pos.start}</span> – <span class="end-date">${pos.end}</span></h7>`;
+        const descContainer = document.createElement("div");
+        descContainer.classList.add("position-description", "card-text");
+        if (t.description || pos.description) {
+          descContainer.appendChild(
+            renderContent(t.description || pos.description)
+          );
+        }
+        card.appendChild(descContainer);
+        if (pos.skills && pos.skills.length > 0) {
+          const badgeContainer = document.createElement("div");
+          badgeContainer.classList.add("position-badges");
+          pos.skills.forEach((skill) => {
+            const badge = document.createElement("span");
+            badge.classList.add("badge", "bg-secondary", "ms-1");
+            badge.setAttribute("data-skill", skill);
+            badge.textContent = skill;
+            badge.style.cursor = "pointer";
+            badge.addEventListener("click", function (event) {
+              event.stopPropagation();
+              if (selectedSkill === skill) {
+                selectedSkill = null;
+                d3.selectAll(".skill-bubble").classed("selected", false);
+                document
+                  .querySelectorAll(".position-card")
+                  .forEach((card) => {
+                    card.classList.remove("dimmed", "highlighted");
+                  });
+                showToastSkillFilter("");
+              } else {
+                selectedSkill = skill;
+                d3.selectAll(".skill-bubble").classed("selected", false);
+                d3.selectAll(".skill-bubble")
+                  .filter(function (d) {
+                    return d.id === skill;
+                  })
+                  .classed("selected", true);
+                document
+                  .querySelectorAll(".position-card")
+                  .forEach((card) => {
+                    const skills = card
+                      .getAttribute("data-skills")
+                      .split(",")
+                      .map((s) => s.trim());
+                    if (skills.includes(skill)) {
+                      card.classList.add("highlighted");
+                      card.classList.remove("dimmed");
+                    } else {
+                      card.classList.add("dimmed");
                     }
                   });
-                  showToastSkillFilter(skillName);
-                }
-              });
-              badgeContainer.appendChild(badge);
-            });
-            card.style.position = "relative";
-            card.appendChild(badgeContainer);
-          }
-          container.appendChild(card);
-        });
-      }
-      function populateSkills(skills) {
-        window.skillData = skills;
-        initSkillTree();
-      }
-      function initSkillTree() {
-        const container = d3.select("#skill-tree-container");
-        const width = container.node().clientWidth;
-        const height = container.node().clientHeight;
-        container.selectAll(".skill-bubble").remove();
-        const nodes = window.skillData.map((d) => Object.assign({}, d));
-        const skillBubbles = container
-          .selectAll(".skill-bubble")
-          .data(nodes)
-          .enter()
-          .append("button")
-          .attr("type", "button")
-          .attr("class", "skill-bubble btn btn-light")
-          .style("font-size", (d) => 10 + d.level * 2 + "px")
-          .text((d) => {
-            if (
-              d.translations &&
-              d.translations[currentLanguage] &&
-              d.translations[currentLanguage].title
-            ) {
-              return d.translations[currentLanguage].title;
-            }
-            return d.id;
-          });
-        skillBubbles.on("mouseenter", (evt, d) => {
-          d3.select(evt.currentTarget).classed("hovered", true);
-          highlightPositions(d.positions);
-          highlightSkillBubbles([d.id]);
-        });
-        skillBubbles.on("mouseleave", (evt, d) => {
-          d3.select(evt.currentTarget).classed("hovered", false);
-          if (!selectedSkill) {
-            unhighlightAllPositions();
-            unhighlightAllSkills();
-          }
-        });
-        skillBubbles.on("click", function (event, d) {
-          event.stopPropagation();
-          if (selectedSkill === d.id) {
-            selectedSkill = null;
-            d3.selectAll(".skill-bubble").classed("selected", false);
-            document.querySelectorAll(".position-card").forEach((card) => {
-              card.classList.remove("dimmed", "highlighted");
-            });
-            showToastSkillFilter("");
-          } else {
-            selectedSkill = d.id;
-            d3.selectAll(".skill-bubble").classed("selected", false);
-            d3.select(this).classed("selected", true);
-            document.querySelectorAll(".position-card").forEach((card) => {
-              const skills = card
-                .getAttribute("data-skills")
-                .split(",")
-                .map((s) => s.trim());
-              if (skills.includes(d.id)) {
-                card.classList.add("highlighted");
-                card.classList.remove("dimmed");
-              } else {
-                card.classList.add("dimmed");
+                let skillName = skill;
+                d3.selectAll(".skill-bubble").each(function (d) {
+                  if (
+                    d.id === skill &&
+                    d.translations &&
+                    d.translations[currentLanguage] &&
+                    d.translations[currentLanguage].title
+                  ) {
+                    skillName = d.translations[currentLanguage].title;
+                  }
+                });
+                showToastSkillFilter(skillName);
               }
             });
-            let skillName =
-              d.translations &&
-              d.translations[currentLanguage] &&
-              d.translations[currentLanguage].title
-                ? d.translations[currentLanguage].title
-                : d.id;
-            showToastSkillFilter(skillName);
-          }
-        });
-        const simulation = d3
-          .forceSimulation(nodes)
-          .force("charge", d3.forceManyBody().strength(-60))
-          .force("x", d3.forceX(width / 2).strength(0.16))
-          .force("y", d3.forceY(height / 2).strength(0.16))
-          .force(
-            "collision",
-            d3
-              .forceCollide()
-              .radius((d) => 20 + d.level * 4)
-              .iterations(2)
-          )
-          .on("tick", () => {
-            skillBubbles
-              .style(
-                "left",
-                (d) => Math.max(0, Math.min(width - 130, d.x)) + "px"
-              )
-              .style(
-                "top",
-                (d) => Math.max(0, Math.min(height - 50, d.y)) + "px"
-              );
+            badgeContainer.appendChild(badge);
           });
-        simulation.alphaTarget(0.2).restart();
-      }
-      function toDate(dateStr) {
-        const parseDate = d3.timeParse("%Y-%m");
-        const parseYear = d3.timeParse("%Y");
-        return dateStr.includes("-") ? parseDate(dateStr) : parseYear(dateStr);
-      }
-      function initTimeline() {
-        const positions = Array.from(
-          document.querySelectorAll(".position-card")
-        )
-          .reverse()
-          .map((card) => {
-            const pid = card.getAttribute("data-id");
-            const startStr = card.getAttribute("data-start");
-            const endStr = card.getAttribute("data-end");
-            const skills = (card.getAttribute("data-skills") || "")
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean);
-            return {
-              id: pid,
-              start: startStr,
-              end: endStr,
-              skills,
-              startDate: toDate(startStr),
-              endDate: toDate(endStr),
-            };
-          });
-        if (!positions.length) return;
-        const minDate = d3.min(positions, (d) => d.startDate);
-        const maxDate = d3.max(positions, (d) => d.endDate);
-        const svgEl = document.getElementById("timeline-svg");
-        const width = svgEl.clientWidth;
-        const height = svgEl.clientHeight;
-        const svg = d3.select(svgEl);
-        svg.selectAll("*").remove();
-        const xScale = d3
-          .scaleTime()
-          .domain([minDate, maxDate])
-          .range([50, width - 50]);
-        const xAxis = d3.axisBottom(xScale).ticks(5);
-        svg
-          .append("g")
-          .attr("transform", `translate(0, ${height - 20})`)
-          .call(xAxis);
-        let tooltip = d3.select("body").select("#timeline-tooltip");
-        if (tooltip.empty()) {
-          tooltip = d3
-            .select("body")
-            .append("div")
-            .attr("id", "timeline-tooltip")
-            .attr("class", "tooltip-custom");
+          card.style.position = "relative";
+          card.appendChild(badgeContainer);
         }
-        svg
-          .selectAll(".timeline-rect")
-          .data(positions)
-          .enter()
-          .append("rect")
-          .attr("class", "timeline-rect")
-          .attr("data-id", (d) => d.id)
-          .attr("x", (d) => xScale(d.startDate))
-          .attr("y", height - 70)
-          .attr("width", (d) =>
-            Math.max(5, xScale(d.endDate) - xScale(d.startDate))
-          )
-          .attr("height", 40)
-          .attr("fill", (d) => {
-            const { normal, highContrast } = getPositionColor(d.id);
-            return document.body.classList.contains("high-contrast")
-              ? highContrast
-              : normal;
-          })
-          .on("mouseenter", function (event, d) {
-            const card = document.querySelector(
-              `.position-card[data-id='${d.id}']`
-            );
-            if (card) card.classList.add("highlighted");
-            highlightSkillBubbles(d.skills);
-            highlightAccomplishments({ positions: [d.id], skills: d.skills });
-            const posConfig = config.positions.find((p) => p.id === d.id);
-            const posTitle =
-              posConfig &&
-              posConfig.translations &&
-              posConfig.translations[currentLanguage]
-                ? posConfig.translations[currentLanguage].title
-                : posConfig
-                ? posConfig.title
-                : d.id;
-            tooltip
-              .html(`Position: ${posTitle}<br>From: ${d.start}<br>To: ${d.end}`)
-              .style("opacity", 1)
-              .style("left", event.pageX + 10 + "px")
-              .style("top", event.pageY + 10 + "px");
-          })
-          .on("mousemove", function (event) {
-            tooltip
-              .style("left", event.pageX + 10 + "px")
-              .style("top", event.pageY + 10 + "px");
-          })
-          .on("mouseleave", function (event, d) {
-            const card = document.querySelector(
-              `.position-card[data-id='${d.id}']`
-            );
-            if (card) card.classList.remove("highlighted");
-            unhighlightAllSkills();
-            unhighlightAccomplishments();
-            tooltip.style("opacity", 0);
-          })
-          .on("click", function (event, d) {
-            const card = document.querySelector(
-              `.position-card[data-id='${d.id}']`
-            );
-            if (card)
-              card.scrollIntoView({ behavior: "smooth", block: "center" });
-          });
-        applyTimelineColors();
-        positionRects(xScale);
-      }
-      function applyTimelineColors() {
-        document.querySelectorAll(".timeline-rect").forEach((rect) => {
-          const d = rect.__data__;
-          const { normal, highContrast } = getPositionColor(d.id);
-          rect.style.fill = document.body.classList.contains("high-contrast")
-            ? highContrast
-            : normal;
-        });
-      }
-      function positionRects(xScale) {
-        const rects = d3.selectAll(".timeline-rect");
-        const occupied = [];
-        rects.each(function (d) {
-          const rect = d3.select(this);
-          const x = xScale(d.startDate);
-          const width = Math.max(5, xScale(d.endDate) - xScale(d.startDate));
-          const height = 40;
-          let y = height + 0;
-          let overlapping = true;
-          while (overlapping) {
-            overlapping = false;
-            for (const occupiedRect of occupied) {
-              if (
-                x < occupiedRect.x + occupiedRect.width &&
-                x + width > occupiedRect.x &&
-                y < occupiedRect.y + occupiedRect.height &&
-                y + height > occupiedRect.y
-              ) {
-                y -= 2;
-                overlapping = true;
-                break;
-              }
-            }
-          }
-          rect.attr("y", y);
-          occupied.push({ x, y, width, height });
-        });
-      }
-      function highlightPositions(posIds) {
-        document.querySelectorAll(".position-card").forEach((card) => {
-          const cID = card.getAttribute("data-id");
-          if (!posIds.includes(cID)) {
-            card.classList.add("dimmed");
-          } else {
-            card.classList.remove("dimmed");
-            card.classList.add("highlighted");
-          }
-        });
-      }
-      function unhighlightAllPositions() {
-        document
-          .querySelectorAll(".position-card")
-          .forEach((card) => card.classList.remove("dimmed", "highlighted"));
-      }
-      function highlightSkillBubbles(skillNames) {
-        const container = d3.select("#skill-tree-container");
-        container.selectAll(".skill-bubble").each(function (sd) {
-          if (skillNames.includes(sd.id))
-            d3.select(this).classed("hovered", true);
-          else d3.select(this).classed("dimmed", true);
-        });
-      }
-      function unhighlightAllSkills() {
-        const container = d3.select("#skill-tree-container");
-        container
-          .selectAll(".skill-bubble")
-          .classed("hovered", false)
-          .classed("dimmed", false);
-      }
-      function highlightAccomplishments(criteria) {
-        document.querySelectorAll(".accomplishment-item").forEach((acc) => {
-          const accPositions = (acc.getAttribute("data-positions") || "")
-            .split(",")
-            .map((s) => s.trim());
-          const accSkills = (acc.getAttribute("data-skills") || "")
-            .split(",")
-            .map((s) => s.trim());
-          const posMatch =
-            criteria.positions &&
-            criteria.positions.some((p) => accPositions.includes(p));
-          const skillMatch =
-            criteria.skills &&
-            criteria.skills.some((s) => accSkills.includes(s));
-          if (posMatch || skillMatch) acc.classList.add("hovered");
-          else acc.classList.remove("hovered");
-        });
-      }
-      function unhighlightAccomplishments() {
-        document
-          .querySelectorAll(".accomplishment-item")
-          .forEach((acc) => acc.classList.remove("hovered"));
-      }
-      function initButtonBounceEffect() {
-        document.querySelectorAll(".btn, .clipboard-btn").forEach((btn) => {
-          btn.addEventListener("mousedown", () => {
-            btn.style.transform = "scale(0.95)";
-          });
-          btn.addEventListener("mouseup", () => {
-            btn.style.transform = "scale(1)";
-          });
-          btn.addEventListener("mouseleave", () => {
-            btn.style.transform = "scale(1)";
-          });
-        });
-      }
-      function initClipboardHandlers() {
-        document.querySelectorAll(".copyable").forEach((elem) => {
-          const clipboardIcon =
-            elem.parentElement.querySelector(".clipboard-btn");
-          if (clipboardIcon) {
-            clipboardIcon.addEventListener("mousedown", () => {
-              clipboardIcon.style.transform = "scale(0.95)";
-            });
-            clipboardIcon.addEventListener("mouseup", () => {
-              clipboardIcon.style.transform = "scale(1)";
-              const text = elem.getAttribute("data-copy") || elem.textContent;
-              copyTextToClipboard(text);
-            });
-          }
-          elem.addEventListener("mousedown", () => {
-            elem.style.transform = "scale(0.95)";
-          });
-          elem.addEventListener("mouseup", () => {
-            elem.style.transform = "scale(1)";
-          });
-        });
-      }
-      function copyTextToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-          showToast();
-        });
-      }
-      function showToast() {
-        const toastEl = document.getElementById("clipboard-toast");
-        const toastText = document.getElementById("clipboard-toast-text");
-        toastText.textContent =
-          config.translations[currentLanguage].clipboard_copied;
-        toastEl.style.display = "block";
-        setTimeout(() => {
-          toastEl.style.display = "none";
-        }, 2000);
-      }
-      function populateAccomplishments(accomplishments) {
-        const container = document.getElementById("accomplishments-list");
-        container.innerHTML = "";
-        accomplishments.forEach((ac) => {
-          const item = document.createElement("div");
-          item.classList.add("accomplishment-item");
-          item.setAttribute("data-positions", ac.positions.join(","));
-          item.setAttribute("data-skills", ac.skills.join(","));
-          item.dataset.acc = JSON.stringify(ac);
-          let labelText = ac.label;
+        container.appendChild(card);
+      });
+    }
+    function populateSkills(skills) {
+      window.skillData = skills;
+      initSkillTree();
+    }
+    function initSkillTree() {
+      const container = d3.select("#skill-tree-container");
+      const width = container.node().clientWidth;
+      const height = container.node().clientHeight;
+      container.selectAll(".skill-bubble").remove();
+      const nodes = window.skillData.map((d) => Object.assign({}, d));
+      const skillBubbles = container
+        .selectAll(".skill-bubble")
+        .data(nodes)
+        .enter()
+        .append("button")
+        .attr("type", "button")
+        .attr("class", "skill-bubble btn btn-light")
+        .style("font-size", (d) => 10 + d.level * 2 + "px")
+        .text((d) => {
           if (
-            ac.translations &&
-            ac.translations[currentLanguage] &&
-            ac.translations[currentLanguage].label
+            d.translations &&
+            d.translations[currentLanguage] &&
+            d.translations[currentLanguage].title
           ) {
-            labelText = ac.translations[currentLanguage].label;
+            return d.translations[currentLanguage].title;
           }
-          item.innerHTML = `<span>${labelText}</span>`;
-          if (ac.attachment) {
-            const btn = document.createElement("a");
-            btn.href = ac.attachment;
-            btn.target = "_blank";
-            btn.classList.add("btn", "btn-outline-secondary", "btn-sm", "ms-2");
-            btn.innerHTML = `<i class="bi bi-paperclip"></i> Open`;
-            btn.addEventListener("mousedown", () => {
-              btn.style.transform = "scale(0.95)";
-            });
-            btn.addEventListener("mouseup", () => {
-              btn.style.transform = "scale(1)";
-            });
-            item.appendChild(btn);
-          }
-          item.addEventListener("mouseenter", () => {
-            item.classList.add("hovered");
-            highlightPositions(ac.positions);
-            highlightSkillBubbles(ac.skills);
-          });
-          item.addEventListener("mouseleave", () => {
-            item.classList.remove("hovered");
-            unhighlightAllPositions();
-            unhighlightAllSkills();
-          });
-          container.appendChild(item);
+          return d.id;
         });
-      }
-      function initPositionHover() {
-        document.querySelectorAll(".position-card").forEach((card) => {
-          card.addEventListener("mouseenter", () => {
-            const rect = document.querySelector(
-              `.timeline-rect[data-id='${card.getAttribute("data-id")}']`
-            );
-            if (rect) rect.classList.add("hovered");
-            const skillNames = (card.getAttribute("data-skills") || "")
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean);
-            highlightSkillBubbles(skillNames);
-            highlightAccomplishments({
-              positions: [card.getAttribute("data-id")],
-              skills: skillNames,
-            });
-            document.querySelectorAll(".timeline-rect").forEach((r) => {
-              if (r.getAttribute("data-id") !== card.getAttribute("data-id"))
-                r.classList.add("dimmed");
-            });
-          });
-          card.addEventListener("mouseleave", () => {
-            const rect = document.querySelector(
-              `.timeline-rect[data-id='${card.getAttribute("data-id")}']`
-            );
-            if (rect) rect.classList.remove("hovered");
-            unhighlightAllSkills();
-            unhighlightAccomplishments();
-            document.querySelectorAll(".timeline-rect").forEach((r) => {
-              r.classList.remove("dimmed");
-            });
-          });
-        });
-      }
-
-      async function sha256Hash(input) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(input);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-        .map(byte => byte.toString(16).padStart(2, "0"))
-        .join("");
-}
-
-async function getProfileImage(email, yamlImage) {
-    if (yamlImage) {
-        return yamlImage; // Use the image from YAML if provided
-    }
-
-    if (email) {
-        const emailHash = await sha256Hash(email.trim().toLowerCase());
-        return `https://api.dicebear.com/7.x/identicon/svg?seed=${emailHash}`;
-    }
-
-    return "https://ui-avatars.com/api/?name=User&size=150"; // Default placeholder
-}
-      // Derive a key from a password and salt using PBKDF2.
-      async function deriveKey(password, salt) {
-        const enc = new TextEncoder();
-        const keyMaterial = await window.crypto.subtle.importKey(
-          "raw",
-          enc.encode(password),
-          { name: "PBKDF2" },
-          false,
-          ["deriveKey"]
-        );
-        return window.crypto.subtle.deriveKey(
-          {
-            name: "PBKDF2",
-            salt: salt,
-            iterations: 100000,
-            hash: "SHA-256",
-          },
-          keyMaterial,
-          { name: "AES-GCM", length: 256 },
-          false,
-          ["encrypt", "decrypt"]
-        );
-      }
-      // Decrypt the given encrypted data (a JSON string) using AES-GCM.
-      async function decryptText(encryptedData, password) {
-        try {
-          const data = JSON.parse(encryptedData);
-          const salt = Uint8Array.from(atob(data.salt), (c) => c.charCodeAt(0));
-          const iv = Uint8Array.from(atob(data.iv), (c) => c.charCodeAt(0));
-          const ciphertext = Uint8Array.from(atob(data.ciphertext), (c) =>
-            c.charCodeAt(0)
-          );
-          const key = await deriveKey(password, salt);
-          const decrypted = await window.crypto.subtle.decrypt(
-            { name: "AES-GCM", iv: iv },
-            key,
-            ciphertext
-          );
-          const dec = new TextDecoder();
-          return dec.decode(decrypted);
-        } catch (error) {
-          throw new Error("Decryption error: " + error.message);
+      skillBubbles.on("mouseenter", (evt, d) => {
+        d3.select(evt.currentTarget).classed("hovered", true);
+        highlightPositions(d.positions);
+        highlightSkillBubbles([d.id]);
+      });
+      skillBubbles.on("mouseleave", (evt, d) => {
+        d3.select(evt.currentTarget).classed("hovered", false);
+        if (!selectedSkill) {
+          unhighlightAllPositions();
+          unhighlightAllSkills();
         }
-      }
-      // Initialize passphrase UI and handler.
-      function initPassphraseHandler() {
-        const toggleBtn = document.getElementById("toggle-passphrase");
-        const passInput = document.getElementById("passphrase-input");
-        toggleBtn.addEventListener("click", function () {
-          if (passInput.type === "password") {
-            passInput.type = "text";
-            toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
-          } else {
-            passInput.type = "password";
-            toggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
-          }
-        });
-        document
-          .getElementById("passphrase-submit")
-          .addEventListener("click", async function () {
-            const passphrase = passInput.value.trim();
-            if (!passphrase) {
-              alert("Passphrase is required to decrypt configuration.");
-              return;
-            }
-            const encryptedYAML = document
-              .getElementById("custom-config")
-              .textContent.trim();
-            let decryptedYAML;
-            try {
-              decryptedYAML = await decryptText(encryptedYAML, passphrase);
-              if (!decryptedYAML) {
-                throw new Error(
-                  "Empty decryption result. Possibly an incorrect passphrase."
-                );
-              }
-            } catch (error) {
-              alert("Decryption failed: " + error.message);
-              return;
-            }
-            try {
-              const newConfig = jsyaml.load(decryptedYAML);
-              config = newConfig;
-              if (config.page_title) document.title = config.page_title;
-              if (config.cv_timestamp)
-                document.getElementById("cv-timestamp").textContent =
-                  "Created: " + config.cv_timestamp;
-              populatePersonalInfo(config.personal_info);
-              populatePositions(config.positions);
-              populateSkills(config.skills);
-              populateAccomplishments(config.accomplishments);
-              updateTranslations();
-              initTimeline();
-              initPositionHover();
-              alert("Configuration unlocked successfully!");
-            } catch (error) {
-              alert("YAML parsing failed: " + error.message);
-              return;
-            }
-          });
-      }
-      function initCV() {
-        const defaultText =
-          document.getElementById("default-config").textContent;
-        config = jsyaml.load(defaultText);
-        if (config.page_title) document.title = config.page_title;
-        if (config.cv_timestamp)
-          document.getElementById("cv-timestamp").textContent =
-            "Created: " + config.cv_timestamp;
-        populatePersonalInfo(config.personal_info);
-        populatePositions(config.positions);
-        populateSkills(config.skills);
-        populateAccomplishments(config.accomplishments);
-        updateTranslations();
-        initTimeline();
-        initPositionHover();
-        initClipboardHandlers();
-        initButtonBounceEffect();
-        initPassphraseHandler();
-      }
-      let currentLanguage = "en";
-      let config = null;
-      let selectedSkill = null;
-      document.addEventListener("DOMContentLoaded", initCV);
-      document.addEventListener("click", function (event) {
-        if (!event.target.closest(".skill-bubble") && selectedSkill !== null) {
+      });
+      skillBubbles.on("click", function (event, d) {
+        event.stopPropagation();
+        if (selectedSkill === d.id) {
           selectedSkill = null;
           d3.selectAll(".skill-bubble").classed("selected", false);
           document.querySelectorAll(".position-card").forEach((card) => {
             card.classList.remove("dimmed", "highlighted");
           });
           showToastSkillFilter("");
+        } else {
+          selectedSkill = d.id;
+          d3.selectAll(".skill-bubble").classed("selected", false);
+          d3.select(this).classed("selected", true);
+          document.querySelectorAll(".position-card").forEach((card) => {
+            const skills = card
+              .getAttribute("data-skills")
+              .split(",")
+              .map((s) => s.trim());
+            if (skills.includes(d.id)) {
+              card.classList.add("highlighted");
+              card.classList.remove("dimmed");
+            } else {
+              card.classList.add("dimmed");
+            }
+          });
+          let skillName =
+            d.translations &&
+              d.translations[currentLanguage] &&
+              d.translations[currentLanguage].title
+              ? d.translations[currentLanguage].title
+              : d.id;
+          showToastSkillFilter(skillName);
         }
       });
-      document.getElementById("passphrase-input").addEventListener("keypress", function (event) {
+      const simulation = d3
+        .forceSimulation(nodes)
+        .force("charge", d3.forceManyBody().strength(-60))
+        .force("x", d3.forceX(width / 2).strength(0.16))
+        .force("y", d3.forceY(height / 2).strength(0.16))
+        .force(
+          "collision",
+          d3
+            .forceCollide()
+            .radius((d) => 20 + d.level * 4)
+            .iterations(2)
+        )
+        .on("tick", () => {
+          skillBubbles
+            .style(
+              "left",
+              (d) => Math.max(0, Math.min(width - 130, d.x)) + "px"
+            )
+            .style(
+              "top",
+              (d) => Math.max(0, Math.min(height - 50, d.y)) + "px"
+            );
+        });
+      simulation.alphaTarget(0.2).restart();
+    }
+    function toDate(dateStr) {
+      const parseDate = d3.timeParse("%Y-%m");
+      const parseYear = d3.timeParse("%Y");
+      return dateStr.includes("-") ? parseDate(dateStr) : parseYear(dateStr);
+    }
+    function initTimeline() {
+      const positions = Array.from(
+        document.querySelectorAll(".position-card")
+      )
+        .reverse()
+        .map((card) => {
+          const pid = card.getAttribute("data-id");
+          const startStr = card.getAttribute("data-start");
+          const endStr = card.getAttribute("data-end");
+          const skills = (card.getAttribute("data-skills") || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          return {
+            id: pid,
+            start: startStr,
+            end: endStr,
+            skills,
+            startDate: toDate(startStr),
+            endDate: toDate(endStr),
+          };
+        });
+      if (!positions.length) return;
+      const minDate = d3.min(positions, (d) => d.startDate);
+      const maxDate = d3.max(positions, (d) => d.endDate);
+      const svgEl = document.getElementById("timeline-svg");
+      const width = svgEl.clientWidth;
+      const height = svgEl.clientHeight;
+      const svg = d3.select(svgEl);
+      svg.selectAll("*").remove();
+      const xScale = d3
+        .scaleTime()
+        .domain([minDate, maxDate])
+        .range([50, width - 50]);
+      const xAxis = d3.axisBottom(xScale).ticks(5);
+      svg
+        .append("g")
+        .attr("transform", `translate(0, ${height - 20})`)
+        .call(xAxis);
+      let tooltip = d3.select("body").select("#timeline-tooltip");
+      if (tooltip.empty()) {
+        tooltip = d3
+          .select("body")
+          .append("div")
+          .attr("id", "timeline-tooltip")
+          .attr("class", "tooltip-custom");
+      }
+      svg
+        .selectAll(".timeline-rect")
+        .data(positions)
+        .enter()
+        .append("rect")
+        .attr("class", "timeline-rect")
+        .attr("data-id", (d) => d.id)
+        .attr("x", (d) => xScale(d.startDate))
+        .attr("y", height - 70)
+        .attr("width", (d) =>
+          Math.max(5, xScale(d.endDate) - xScale(d.startDate))
+        )
+        .attr("height", 40)
+        .attr("fill", (d) => {
+          const { normal, highContrast } = getPositionColor(d.id);
+          return document.body.classList.contains("high-contrast")
+            ? highContrast
+            : normal;
+        })
+        .on("mouseenter", function (event, d) {
+          const card = document.querySelector(
+            `.position-card[data-id='${d.id}']`
+          );
+          if (card) card.classList.add("highlighted");
+          highlightSkillBubbles(d.skills);
+          highlightAccomplishments({ positions: [d.id], skills: d.skills });
+          const posConfig = config.positions.find((p) => p.id === d.id);
+          const posTitle =
+            posConfig &&
+              posConfig.translations &&
+              posConfig.translations[currentLanguage]
+              ? posConfig.translations[currentLanguage].title
+              : posConfig
+                ? posConfig.title
+                : d.id;
+          tooltip
+            .html(`Position: ${posTitle}<br>From: ${d.start}<br>To: ${d.end}`)
+            .style("opacity", 1)
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY + 10 + "px");
+        })
+        .on("mousemove", function (event) {
+          tooltip
+            .style("left", event.pageX + 10 + "px")
+            .style("top", event.pageY + 10 + "px");
+        })
+        .on("mouseleave", function (event, d) {
+          const card = document.querySelector(
+            `.position-card[data-id='${d.id}']`
+          );
+          if (card) card.classList.remove("highlighted");
+          unhighlightAllSkills();
+          unhighlightAccomplishments();
+          tooltip.style("opacity", 0);
+        })
+        .on("click", function (event, d) {
+          const card = document.querySelector(
+            `.position-card[data-id='${d.id}']`
+          );
+          if (card)
+            card.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+      applyTimelineColors();
+      positionRects(xScale);
+    }
+    function applyTimelineColors() {
+      document.querySelectorAll(".timeline-rect").forEach((rect) => {
+        const d = rect.__data__;
+        const { normal, highContrast } = getPositionColor(d.id);
+        rect.style.fill = document.body.classList.contains("high-contrast")
+          ? highContrast
+          : normal;
+      });
+    }
+    function positionRects(xScale) {
+      const rects = d3.selectAll(".timeline-rect");
+      const occupied = [];
+      rects.each(function (d) {
+        const rect = d3.select(this);
+        const x = xScale(d.startDate);
+        const width = Math.max(5, xScale(d.endDate) - xScale(d.startDate));
+        const height = 40;
+        let y = height + 0;
+        let overlapping = true;
+        while (overlapping) {
+          overlapping = false;
+          for (const occupiedRect of occupied) {
+            if (
+              x < occupiedRect.x + occupiedRect.width &&
+              x + width > occupiedRect.x &&
+              y < occupiedRect.y + occupiedRect.height &&
+              y + height > occupiedRect.y
+            ) {
+              y -= 2;
+              overlapping = true;
+              break;
+            }
+          }
+        }
+        rect.attr("y", y);
+        occupied.push({ x, y, width, height });
+      });
+    }
+    function highlightPositions(posIds) {
+      document.querySelectorAll(".position-card").forEach((card) => {
+        const cID = card.getAttribute("data-id");
+        if (!posIds.includes(cID)) {
+          card.classList.add("dimmed");
+        } else {
+          card.classList.remove("dimmed");
+          card.classList.add("highlighted");
+        }
+      });
+    }
+    function unhighlightAllPositions() {
+      document
+        .querySelectorAll(".position-card")
+        .forEach((card) => card.classList.remove("dimmed", "highlighted"));
+    }
+    function highlightSkillBubbles(skillNames) {
+      const container = d3.select("#skill-tree-container");
+      container.selectAll(".skill-bubble").each(function (sd) {
+        if (skillNames.includes(sd.id))
+          d3.select(this).classed("hovered", true);
+        else d3.select(this).classed("dimmed", true);
+      });
+    }
+    function unhighlightAllSkills() {
+      const container = d3.select("#skill-tree-container");
+      container
+        .selectAll(".skill-bubble")
+        .classed("hovered", false)
+        .classed("dimmed", false);
+    }
+    function highlightAccomplishments(criteria) {
+      document.querySelectorAll(".accomplishment-item").forEach((acc) => {
+        const accPositions = (acc.getAttribute("data-positions") || "")
+          .split(",")
+          .map((s) => s.trim());
+        const accSkills = (acc.getAttribute("data-skills") || "")
+          .split(",")
+          .map((s) => s.trim());
+        const posMatch =
+          criteria.positions &&
+          criteria.positions.some((p) => accPositions.includes(p));
+        const skillMatch =
+          criteria.skills &&
+          criteria.skills.some((s) => accSkills.includes(s));
+        if (posMatch || skillMatch) acc.classList.add("hovered");
+        else acc.classList.remove("hovered");
+      });
+    }
+    function unhighlightAccomplishments() {
+      document
+        .querySelectorAll(".accomplishment-item")
+        .forEach((acc) => acc.classList.remove("hovered"));
+    }
+    function initButtonBounceEffect() {
+      document.querySelectorAll(".btn, .clipboard-btn").forEach((btn) => {
+        btn.addEventListener("mousedown", () => {
+          btn.style.transform = "scale(0.95)";
+        });
+        btn.addEventListener("mouseup", () => {
+          btn.style.transform = "scale(1)";
+        });
+        btn.addEventListener("mouseleave", () => {
+          btn.style.transform = "scale(1)";
+        });
+      });
+    }
+    function initClipboardHandlers() {
+      document.querySelectorAll(".copyable").forEach((elem) => {
+        const clipboardIcon =
+          elem.parentElement.querySelector(".clipboard-btn");
+        if (clipboardIcon) {
+          clipboardIcon.addEventListener("mousedown", () => {
+            clipboardIcon.style.transform = "scale(0.95)";
+          });
+          clipboardIcon.addEventListener("mouseup", () => {
+            clipboardIcon.style.transform = "scale(1)";
+            const text = elem.getAttribute("data-copy") || elem.textContent;
+            copyTextToClipboard(text);
+          });
+        }
+        elem.addEventListener("mousedown", () => {
+          elem.style.transform = "scale(0.95)";
+        });
+        elem.addEventListener("mouseup", () => {
+          elem.style.transform = "scale(1)";
+        });
+      });
+    }
+    function copyTextToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+      });
+    }
+    function showToast() {
+      const toastEl = document.getElementById("clipboard-toast");
+      const toastText = document.getElementById("clipboard-toast-text");
+      toastText.textContent =
+        config.translations[currentLanguage].clipboard_copied;
+      toastEl.style.display = "block";
+      setTimeout(() => {
+        toastEl.style.display = "none";
+      }, 2000);
+    }
+    function populateAccomplishments(accomplishments) {
+      const container = document.getElementById("accomplishments-list");
+      container.innerHTML = "";
+      accomplishments.forEach((ac) => {
+        const item = document.createElement("div");
+        item.classList.add("accomplishment-item");
+        item.setAttribute("data-positions", ac.positions.join(","));
+        item.setAttribute("data-skills", ac.skills.join(","));
+        item.dataset.acc = JSON.stringify(ac);
+        let labelText = ac.label;
+        if (
+          ac.translations &&
+          ac.translations[currentLanguage] &&
+          ac.translations[currentLanguage].label
+        ) {
+          labelText = ac.translations[currentLanguage].label;
+        }
+        item.innerHTML = `<span>${labelText}</span>`;
+        if (ac.attachment) {
+          const btn = document.createElement("a");
+          btn.href = ac.attachment;
+          btn.target = "_blank";
+          btn.classList.add("btn", "btn-outline-secondary", "btn-sm", "ms-2");
+          btn.innerHTML = `<i class="bi bi-paperclip"></i> Open`;
+          btn.addEventListener("mousedown", () => {
+            btn.style.transform = "scale(0.95)";
+          });
+          btn.addEventListener("mouseup", () => {
+            btn.style.transform = "scale(1)";
+          });
+          item.appendChild(btn);
+        }
+        item.addEventListener("mouseenter", () => {
+          item.classList.add("hovered");
+          highlightPositions(ac.positions);
+          highlightSkillBubbles(ac.skills);
+        });
+        item.addEventListener("mouseleave", () => {
+          item.classList.remove("hovered");
+          unhighlightAllPositions();
+          unhighlightAllSkills();
+        });
+        container.appendChild(item);
+      });
+    }
+    function initPositionHover() {
+      document.querySelectorAll(".position-card").forEach((card) => {
+        card.addEventListener("mouseenter", () => {
+          const rect = document.querySelector(
+            `.timeline-rect[data-id='${card.getAttribute("data-id")}']`
+          );
+          if (rect) rect.classList.add("hovered");
+          const skillNames = (card.getAttribute("data-skills") || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          highlightSkillBubbles(skillNames);
+          highlightAccomplishments({
+            positions: [card.getAttribute("data-id")],
+            skills: skillNames,
+          });
+          document.querySelectorAll(".timeline-rect").forEach((r) => {
+            if (r.getAttribute("data-id") !== card.getAttribute("data-id"))
+              r.classList.add("dimmed");
+          });
+        });
+        card.addEventListener("mouseleave", () => {
+          const rect = document.querySelector(
+            `.timeline-rect[data-id='${card.getAttribute("data-id")}']`
+          );
+          if (rect) rect.classList.remove("hovered");
+          unhighlightAllSkills();
+          unhighlightAccomplishments();
+          document.querySelectorAll(".timeline-rect").forEach((r) => {
+            r.classList.remove("dimmed");
+          });
+        });
+      });
+    }
+
+    function simpleHash(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i); // Bitwise hash
+        hash |= 0; // Convert to 32-bit integer
+      }
+      return Math.abs(hash); // Ensure positive value
+    }
+
+    function getProfileImage(email, yamlImage) {
+      if (yamlImage) {
+        return yamlImage; // Use the image from YAML if provided
+      }
+
+      if (email) {
+        const emailHash = simpleHash(email.trim().toLowerCase());
+        return `https://api.dicebear.com/7.x/identicon/svg?seed=${emailHash}`;
+      }
+
+      return "https://ui-avatars.com/api/?name=User&size=150"; // Default placeholder
+    }
+
+    // Derive a key from a password and salt using PBKDF2.
+    function deriveKey(password, salt) {
+      const enc = new TextEncoder();
+      const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        enc.encode(password),
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+      );
+      return window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 100000,
+          hash: "SHA-256",
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    // Decrypt the given encrypted data (a JSON string) using AES-GCM.
+    function decryptText(encryptedData, password) {
+      try {
+        const data = JSON.parse(encryptedData);
+        const salt = Uint8Array.from(atob(data.salt), (c) => c.charCodeAt(0));
+        const iv = Uint8Array.from(atob(data.iv), (c) => c.charCodeAt(0));
+        const ciphertext = Uint8Array.from(atob(data.ciphertext), (c) =>
+          c.charCodeAt(0)
+        );
+        const key = deriveKey(password, salt);
+        const decrypted = await window.crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: iv },
+          key,
+          ciphertext
+        );
+        const dec = new TextDecoder();
+        return dec.decode(decrypted);
+      } catch (error) {
+        throw new Error("Decryption error: " + error.message);
+      }
+    }
+
+    // Initialize passphrase UI and handler.
+    function initPassphraseHandler() {
+      const toggleBtn = document.getElementById("toggle-passphrase");
+      const passInput = document.getElementById("passphrase-input");
+      toggleBtn.addEventListener("click", function () {
+        if (passInput.type === "password") {
+          passInput.type = "text";
+          toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+        } else {
+          passInput.type = "password";
+          toggleBtn.innerHTML = '<i class="bi bi-eye"></i>';
+        }
+      });
+      document
+        .getElementById("passphrase-submit")
+        .addEventListener("click", async function () {
+          const passphrase = passInput.value.trim();
+          if (!passphrase) {
+            alert("Passphrase is required to decrypt configuration.");
+            return;
+          }
+          const encryptedYAML = document
+            .getElementById("custom-config")
+            .textContent.trim();
+          let decryptedYAML;
+          try {
+            decryptedYAML = decryptText(encryptedYAML, passphrase);
+            if (!decryptedYAML) {
+              throw new Error(
+                "Empty decryption result. Possibly an incorrect passphrase."
+              );
+            }
+          } catch (error) {
+            alert("Decryption failed: " + error.message);
+            return;
+          }
+          try {
+            const newConfig = jsyaml.load(decryptedYAML);
+            config = newConfig;
+            if (config.page_title) document.title = config.page_title;
+            if (config.cv_timestamp)
+              document.getElementById("cv-timestamp").textContent =
+                "Created: " + config.cv_timestamp;
+            populatePersonalInfo(config.personal_info);
+            populatePositions(config.positions);
+            populateSkills(config.skills);
+            populateAccomplishments(config.accomplishments);
+            updateTranslations();
+            initTimeline();
+            initPositionHover();
+            alert("Configuration unlocked successfully!");
+          } catch (error) {
+            alert("YAML parsing failed: " + error.message);
+            return;
+          }
+        });
+    }
+    function initCV() {
+      const defaultText =
+        document.getElementById("default-config").textContent;
+      config = jsyaml.load(defaultText);
+      if (config.page_title) document.title = config.page_title;
+      if (config.cv_timestamp)
+        document.getElementById("cv-timestamp").textContent =
+          "Created: " + config.cv_timestamp;
+      populatePersonalInfo(config.personal_info);
+      populatePositions(config.positions);
+      populateSkills(config.skills);
+      populateAccomplishments(config.accomplishments);
+      updateTranslations();
+      initTimeline();
+      initPositionHover();
+      initClipboardHandlers();
+      initButtonBounceEffect();
+      initPassphraseHandler();
+    }
+    let currentLanguage = "en";
+    let config = null;
+    let selectedSkill = null;
+    document.addEventListener("DOMContentLoaded", initCV);
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest(".skill-bubble") && selectedSkill !== null) {
+        selectedSkill = null;
+        d3.selectAll(".skill-bubble").classed("selected", false);
+        document.querySelectorAll(".position-card").forEach((card) => {
+          card.classList.remove("dimmed", "highlighted");
+        });
+        showToastSkillFilter("");
+      }
+    });
+    document
+      .getElementById("passphrase-input")
+      .addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
           event.preventDefault(); // Prevent form submission if inside a form
           document.getElementById("passphrase-submit").click();
         }
       });
-      let resizeTimer;
-      window.addEventListener("resize", () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          initSkillTree();
-          initTimeline();
-        }, 200);
-      });
-      /*]]>*/
-    </script>
-  </body>
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        initSkillTree();
+        initTimeline();
+      }, 200);
+    });
+    /*]]>*/
+  </script>
+</body>
+
 </html>
