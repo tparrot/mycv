@@ -1024,10 +1024,9 @@
       if (phoneLink)
         phoneLink.href = "tel:" + info.phone.replace(/[^0-9+]/g, "");
 
-      getProfileImage(info.email, info.image).then((profileImageSrc) => {
-        const imgElement = document.getElementById("portrait-image");
-        if (imgElement) imgElement.src = profileImageSrc;
-      });
+      const profileImageSrc = getProfileImage(info.email, info.image);
+      const imgElement = document.getElementById("portrait-image");
+      if (imgElement) imgElement.src = profileImageSrc;
     }
     function populatePositions(positions) {
       const container = document.getElementById("position-list");
