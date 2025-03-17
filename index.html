@@ -77,7 +77,6 @@
       border-color: var(--hc-border) !important;
       color: var(--hc-text) !important;
       background: none !important;
-      min-width: fit-content;
     }
 
     body.high-contrast .card,
@@ -237,6 +236,7 @@
       }
     }
 
+
     .portrait {
       width: 120px;
       height: 120px;
@@ -312,7 +312,7 @@
     /* Skill Tree */
     #skill-tree-container {
       position: relative;
-      height: 400px;
+      height: 50vh;
     }
 
     #skill-tree-legend {
@@ -393,13 +393,32 @@
     .accomplishment-item {
       position: relative;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
       margin-bottom: 0.25rem;
       padding: 0.25rem 0.5rem;
       background: none;
       border: none;
       transition: background-color 0.2s;
+      flex-wrap: wrap;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      align-content: center;
+    }
+
+
+    @media (max-width: 1199px) {
+      .accomplishment-item {
+        justify-content: center;
+        flex-flow: column;
+      }
+    }
+
+    .accomplishment-item a .btn {
+      min-width: fit-content;
+    }
+
+    .accomplishment-item span {
+      text-align: center;
     }
 
     .accomplishment-item:hover {
@@ -534,7 +553,7 @@
         Switch to German
       </button>
       <button id="contrast-toggle" class="btn btn-outline-primary" onclick="toggleContrast()" data-i18n="contrast_toggle">
-        Toggle Accessibility
+         Accessibility Toggle
       </button>
       <button id="print-btn" class="btn btn-outline-primary" onclick="window.print()" data-i18n="print">
         Print
@@ -775,7 +794,7 @@
           skill_filter_toast: "Showing positions with skill: {skill}"
           skill_filter_clear_toast: "Skill filter removed"
           lang_toggle: "Switch to German"
-          contrast_toggle: "Toggle Accessibility"
+          contrast_toggle: "Accessibility Toggle"
           print: "Print"
           passphrase_submit: "Unlock"
           passphrase_prompt: "Enter passphrase"
@@ -797,7 +816,7 @@
           lang_toggle: "Auf Englisch wechseln"
           contrast_toggle: "Barrierefreiheit umschalten"
           print: "Drucken"
-          passphrase_submit: "Entsperren"
+          passphrase_submit: "Öffnen"
           passphrase_prompt: "Passwort eingeben"
           passphrase_required: "Passphrase ist erforderlich, um die Konfiguration zu entschlüsseln."
           decryption_failed: "Entschlüsselung fehlgeschlagen: {error}"
