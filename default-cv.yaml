@@ -1,0 +1,105 @@
+page_title: "CV for John Doe"
+cv_timestamp: "2025-03-13"
+personal_info:
+  name: "Max Mustermann"
+  title: "Systems Engineer"
+  birthplace: "Berlin, Germany"
+  dob: "1990-01-21"
+  phone: "+49 170 994883"
+  email: "max@mustercloud.de"
+  languages: "English, German, French"
+  email_tooltip_en: "Click to send mail"
+  email_tooltip_de: "Mail senden"
+  phone_tooltip_en: "Click to call"
+  phone_tooltip_de: "Anrufen"
+
+positions:
+  - id: "1"
+    color: "#b3cde0"
+    company: "1 GmbH"
+    translations:
+      en:
+        title: "Systems Engineer"
+        description:
+          - type: paragraph
+            text: "Implemented CI/CD via GitHub, automated monitoring with OpsGenie and CloudWatch."
+          - type: list
+            items:
+              - "Designed service and infrastructure architecture"
+              - "Practiced Scrum"
+              - "Used Terraform and AWS"
+          - type: paragraph
+            text: "And much more."
+      de:
+        title: "Fachinformatiker"
+        description: "Implementierung von CI/CD über GitHub Enterprise, automatisierte Überwachung mit OpsGenie und CloudWatch, Planung und Umsetzung von Service- und Infrastrukturlösungen, Scrum, Terraform und AWS."
+    start: "2020-03"
+    end: "2025-03"
+    skills: ["AWS", "CI/CD", "Opsgenie", "CloudWatch"]
+  - id: "2"
+    color: "#b3cde0"
+    company: "2 GmbH"
+    translations:
+      en:
+        title: "Admin"
+        description: "Maintained Servers."
+
+      de:
+        title: "Systemadministrator"
+        description: "Verwaltete Server."
+    start: "2015-03"
+    end: "2020-02"
+    skills: ["CI/CD", "Hardware"]
+
+
+skills:
+  - id: "GitHub"
+    level: 10
+    positions: ["1"]
+  - id: "AWS"
+    level: 3
+    positions: ["1"]
+  - id: "CI/CD"
+    level: 3
+    positions: ["1", "2"]
+  - id: "Hardware"
+    level: 7
+    positions: ["1", "2"]
+
+accomplishments:
+  - label: "aws"
+    positions: ["1"]
+    skills: ["AWS"]
+    attachment: "label.pdf"
+    translations:
+      en:
+        label: "AWS Certificate"
+      de:
+        label: "AWS Zertifizierung"
+
+preferences:
+  - id: "homeoffice"
+    level: 10
+    translations:
+      en: "Homeoffice"
+      de: "Homeoffice"
+  - id: "infrastructure"
+    level: 8
+    translations:
+      en: "Infrastructure"
+      de: "Infrastruktur"
+  - id: "scrum"
+    level: 5
+    translations:
+      en: "Scrum"
+      de: "Scrum"
+  - id: "learning"
+    level: 5
+    translations:
+      en: "Continous Learning"
+      de: "Weiterbildungen"
+  - id: "flexible_hours"
+    level: 6
+    translations:
+      en: "Flexible Hours"
+      de: "Flexible Arbeitszeiten"
