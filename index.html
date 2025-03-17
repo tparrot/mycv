@@ -536,80 +536,110 @@
 
     /* Print Styles */
     @media print {
-      body {
-        font-size: 11pt;
-        margin: 0.5cm;
+      @page {
+        size: A4;
+        margin: 1cm;
       }
 
-      .position-card,
-      .card,
-      .accomplishment-item {
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-
-      .top-buttons,
-      #clipboard-toast,
-      .bi.btn,
-      .accomplishment-item>.btn,
-      .clipboard-btn,
-      #skill-animation-switch {
-        display: none !important;
-      }
-
-      .container {
+      html, body {
         width: 210mm;
+        height: 297mm;
+        font-size: 11pt;
+        margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      /* Layout structure */
+      .container {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
         overflow: visible !important;
       }
 
-      /* Force a desktop layout (side-by-side) */
       .row {
         display: flex !important;
         flex-direction: row !important;
+        width: 100% !important;
+        margin: 0 !important;
       }
 
-      /*aside,
-      main {
-        width: 50% !important;
-      }*/
-      .container,
-      .row,
-      aside,
-      main {
-        display: block;
-        width: 100%;
+      aside {
+        width: 40% !important;
+        float: left !important;
+        margin: 0 !important;
+        padding-right: 1rem !important;
         overflow: visible !important;
       }
 
-      /* For print, force the skill tree into a flex layout so skills appear side by side */
+      main {
+        width: 60% !important;
+        float: right !important;
+        margin: 0 !important;
+        padding-left: 1rem !important;
+        overflow: visible !important;
+      }
+
+      /* Skills visualization */
       #skill-tree-container {
         display: flex !important;
-        flex-wrap: wrap !important;
-        align-items: center;
-        justify-content: flex-start;
+        flex-flow: row wrap !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
         height: auto !important;
-        border: none;
+        min-height: 0 !important;
+        overflow: visible !important;
       }
 
       .skill-bubble {
-        margin: 2px;
         position: static !important;
+        display: inline-block !important;
+        margin: 4px !important;
         transform: none !important;
-        outline: none !important;
+        page-break-inside: avoid !important;
       }
 
-      /* Timeline SVG: scale to fit DIN A4 width */
-      #timeline-svg-container {
+      /* Preferences visualization */
+      .preferences-container {
+        width: 50% !important;
+        height: auto !important;
+        overflow: visible !important;
+        page-break-inside: avoid !important;
+      }
+
+      .preferences-treemap,
+      .preferences-bar-chart {
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        transform: scale(0.7) !important;
+        position: relative !important;
+        left: -3rem !important;
+      }
+
+      /* Prevent unwanted breaks */
+      .position-card,
+      .card,
+      .accomplishment-item {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 1rem !important;
+      }
+
+      /* Hide interactive elements */
+      .top-buttons,
+      #preferences-view-switch,
+      #timeline-svg-container,
+      #generic-toast,
+      .toast,
+      .clipboard-btn,
+      #skill-animation-switch,
+      .bi.btn,
+      .accomplishment-item > .btn > i {
         display: none !important;
-      }
-
-      /* Remove extra margins */
-      .container,
-      .row,
-      aside,
-      main {
-        margin: 0;
-        padding: 0;
       }
     }
 
@@ -861,103 +891,6 @@
     .preferences-treemap rect {
       rx: 4px;
       ry: 4px;
-    }
-
-    /* Update Print Styles */
-    @media print {
-      @page {
-        size: A4;
-        margin: 1cm;
-      }
-
-      html, body {
-        width: 210mm;
-        height: 297mm;
-        font-size: 11pt;
-        margin: 0;
-        padding: 0;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-
-      .container {
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      .row {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        margin: 0 !important;
-      }
-
-      aside {
-        width: 30% !important;
-        float: left !important;
-        margin: 0 !important;
-        padding-right: 1rem !important;
-      }
-
-      main {
-        width: 70% !important;
-        float: right !important;
-        margin: 0 !important;
-        padding-left: 1rem !important;
-      }
-
-      /* Force elements to stay within their containers */
-      .preferences-container {
-        width: 100% !important;
-        height: auto !important;
-        overflow: hidden !important;
-        page-break-inside: avoid !important;
-      }
-
-      .preferences-treemap,
-      .preferences-bar-chart {
-        max-width: 100% !important;
-        height: auto !important;
-      }
-
-      /* Ensure skill bubbles stay within bounds */
-      #skill-tree-container {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        height: auto !important;
-        overflow: hidden !important;
-      }
-
-      .skill-bubble {
-        position: relative !important;
-        margin: 2px !important;
-        transform: none !important;
-      }
-
-      /* Control page breaks */
-      .card {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-      }
-
-      .position-card {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        margin-bottom: 1rem !important;
-      }
-
-      /* Hide UI elements */
-      .top-buttons,
-      #preferences-view-switch,
-      #timeline-svg-container,
-      #generic-toast,
-      .toast,
-      .clipboard-btn,
-      #skill-animation-switch {
-        display: none !important;
-      }
     }
   </style>
 </head>
@@ -2347,7 +2280,7 @@
     function renderPreferences(preferences, isBarChart, container) {
       container.selectAll("*").remove();
       const width = container.node().clientWidth;
-      const height = width * 0.6;
+      const height = width * 1;
 
       // Helper function to get translated text
       const getTranslatedText = (item) =>
@@ -2363,7 +2296,6 @@
 
         const svg = container.append("svg")
           .attr("class", "preferences-container")
-          .attr("width", width)
           .attr("height", chartHeight);
 
         const x = d3.scaleLinear()
@@ -2407,7 +2339,6 @@
       } else {
         const svg = container.append("svg")
           .attr("class", "preferences-container preferences-treemap")
-          .attr("width", width)
           .attr("height", height);
 
         const treemapData = {
