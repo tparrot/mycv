@@ -2271,10 +2271,12 @@
 
       d3.select("#preferences-view-toggle").on("change", function () {
         renderPreferences(preferences, this.checked, vizContainer);
+        updateTranslations();
       });
 
       // Initial render
       renderPreferences(preferences, false, vizContainer);
+      updateTranslations();
     }
 
     function renderPreferences(preferences, isBarChart, container) {
