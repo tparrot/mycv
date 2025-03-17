@@ -66,6 +66,12 @@
       /* Rich purple */
       --highlight-12: #A52FFF;
       /* Deep purple */
+
+      /* Category Colors */
+      --category-education: #4a90e2;
+      --category-work: #50c878;
+      --category-volunteering: #ffa500;
+      --category-text: #ffffff;
     }
 
     body {
@@ -116,7 +122,6 @@
 
     body.high-contrast #timeline-svg-container {
       background: var(--hc-bg) !important;
-      height: 15vh !important;
     }
 
     body.high-contrast #timeline-svg {
@@ -131,7 +136,7 @@
       fill: var(--hc-timeline-fill);
     }
 
-    body.high-contrast #skill-tree-container {
+    body.high-contrast #skill-tree-chart-container {
       height: auto !important;
     }
 
@@ -168,7 +173,8 @@
     }
 
     body.high-contrast .position-card .text-muted,
-    body.high-contrast #skill-tree-legend {
+    body.high-contrast #skill-tree-legend,
+    body.high-contrast #preferences-legend {
       color: var(--hc-text) !important;
     }
 
@@ -359,14 +365,11 @@
     }
 
     /* Skill Tree */
-    #skill-tree-container {
+    #skill-tree-chart-container {
       position: relative;
-      height: 50vh;
-    }
-
-    #skill-tree-legend {
-      display: flex;
-      width: 100%;
+      min-height: 30vh;
+      transition: height 0.2s;
+      height: auto;
     }
 
     #skill-animation-switch {
@@ -410,11 +413,10 @@
 
     #timeline-svg-container {
       width: 100%;
-      height: 10vh;
+      height: 25vh;
       position: sticky;
       top: 0;
       z-index: 90;
-      margin-top: 10vh;
       /*box-shadow: 0 4px 4px -2px rgba(0,0,0,0.3);
       background: var(--color-bg);*/
       overflow: show;
@@ -436,6 +438,29 @@
 
     .timeline-rect:hover {
       fill-opacity: 1;
+    }
+
+    .timeline-label {
+      font-family: sans-serif;
+      font-size: 12px;
+      fill: var(--color-text);
+    }
+
+    .timeline-category {
+      font-family: sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      fill: var(--color-text);
+    }
+    #timeline-card h5 {
+      z-index: 100;
+      position: relative;
+    }
+
+    body.high-contrast .timeline-label,
+    body.high-contrast .timeline-category {
+      fill: var(--hc-text);
+      font-size: 16px;
     }
 
     /* Accomplishments */
@@ -537,109 +562,107 @@
     /* Print Styles */
     @media print {
       @page {
-        size: A4;
-        margin: 1cm;
+      size: A4;
+      margin: 1cm;
       }
 
       html, body {
-        width: 210mm;
-        height: 297mm;
-        font-size: 11pt;
-        margin: 0;
-        padding: 0;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+      width: 210mm;
+      height: 297mm;
+      font-size: 11pt;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
       }
 
-      /* Layout structure */
+      /* Force widest Bootstrap scaling for print */
       .container {
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: visible !important;
+      width: 100% !important;
+      max-width: 100% !important; /* Ensure full width for print */
+      margin: 0 auto !important;
+      padding: 1rem !important; /* Add padding for better alignment */
+      overflow: visible !important;
       }
 
       .row {
-        display: flex !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        margin: 0 !important;
+      display: flex !important;
+      flex-direction: row !important;
+      width: 100% !important;
+      margin: 0 !important;
       }
 
       aside {
-        width: 40% !important;
-        float: left !important;
-        margin: 0 !important;
-        padding-right: 1rem !important;
-        overflow: visible !important;
+      width: 40% !important;
+      float: left !important;
+      margin: 0 !important;
+      padding-right: 1rem !important;
+      overflow: visible !important;
       }
 
       main {
-        width: 60% !important;
-        float: right !important;
-        margin: 0 !important;
-        padding-left: 1rem !important;
-        overflow: visible !important;
+      width: 60% !important;
+      float: right !important;
+      margin: 0 !important;
+      padding-left: 1rem !important;
+      overflow: visible !important;
       }
 
       /* Skills visualization */
-      #skill-tree-container {
-        display: flex !important;
-        flex-flow: row wrap !important;
-        align-items: flex-start !important;
-        justify-content: flex-start !important;
-        height: auto !important;
-        min-height: 0 !important;
-        overflow: visible !important;
+      #skill-tree-chart-container {
+      display: block !important; /* Ensure block layout for print */
+      height: auto !important;
+      min-height: 30vh !important; /* Set a minimum height */
+      overflow: visible !important;
+      margin: 0 auto !important; /* Center align */
       }
 
       .skill-bubble {
-        position: static !important;
-        display: inline-block !important;
-        margin: 4px !important;
-        transform: none !important;
-        page-break-inside: avoid !important;
+      position: static !important;
+      display: inline-block !important;
+      margin: 4px !important;
+      transform: none !important;
+      page-break-inside: avoid !important;
       }
 
       /* Preferences visualization */
       .preferences-container {
-        width: 50% !important;
-        height: auto !important;
-        overflow: visible !important;
-        page-break-inside: avoid !important;
+      width: 50% !important;
+      height: auto !important;
+      overflow: visible !important;
+      page-break-inside: avoid !important;
       }
 
       .preferences-treemap,
       .preferences-bar-chart {
-        width: 100% !important;
-        height: auto !important;
-        overflow: visible !important;
-        transform: scale(0.7) !important;
-        position: relative !important;
-        left: -3rem !important;
+      width: 100% !important;
+      height: auto !important;
+      overflow: visible !important;
+      transform: scale(0.7) !important;
+      position: relative !important;
+      left: -3rem !important;
       }
 
       /* Prevent unwanted breaks */
       .position-card,
       .card,
       .accomplishment-item {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        margin-bottom: 1rem !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      margin-bottom: 1rem !important;
       }
 
       /* Hide interactive elements */
       .top-buttons,
       #preferences-view-switch,
-      #timeline-svg-container,
+      #timeline-card,
       #generic-toast,
       .toast,
       .clipboard-btn,
       #skill-animation-switch,
       .bi.btn,
       .accomplishment-item > .btn > i {
-        display: none !important;
+      display: none !important;
       }
     }
 
@@ -672,45 +695,6 @@
     body.high-contrast .preference-label {
       fill: var(--hc-text);
       font-size: 14px;
-    }
-
-    .preferences-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-      z-index: 1000;
-    }
-
-    .preferences-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .preference-focus {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.5);
-      background: var(--color-bg);
-      padding: 20px;
-      border-radius: 10px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-      z-index: 1001;
-      text-align: center;
-    }
-
-    .preference-focus.active {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-      visibility: visible;
     }
 
     body.high-contrast .preference-focus {
@@ -755,7 +739,7 @@
     }
 
     .preferences-bar-chart-container {
-      padding: 20px;
+      padding: 0px 20px;
     }
 
     .preferences-bar-chart {
@@ -892,6 +876,58 @@
       rx: 4px;
       ry: 4px;
     }
+
+    /* Add these styles in the style section */
+    .category-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .category-badge.education {
+      background-color: var(--category-education);
+      color: var(--category-text);
+    }
+
+    .category-badge.work {
+      background-color: var(--category-work);
+      color: var(--category-text);
+    }
+
+    .category-badge.volunteering {
+      background-color: var(--category-volunteering);
+      color: var(--category-text);
+    }
+
+    body.high-contrast .category-badge {
+      border: 1px solid var(--hc-border);
+    }
+
+    /* Add new styles for treemap interaction */
+    .preferences-treemap-cell {
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+    }
+
+    .preferences-legend {
+      text-align: center;
+      color: var(--color-muted);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Update button animation utility class */
+    .btn-animate {
+      transition: transform 0.1s ease-in-out;
+    }
+
+    .btn-animate:active {
+      transform: scale(0.95);
+    }
   </style>
 </head>
 
@@ -974,7 +1010,7 @@
         <div class="card mb-3">
           <div class="card-body">
             <h5 class="text-center" data-i18n="skills"></h5>
-            <div id="skill-tree-container"></div>
+            <div id="skill-tree-chart-container"></div>
             <p id="skill-tree-legend" class="text-center text-muted small mt-2" data-i18n="skills_legend">
             </p>
           </div>
@@ -983,7 +1019,8 @@
         <div class="card mb-3">
           <div class="card-body">
             <h5 class="text-center" data-i18n="preferences"></h5>
-            <div id="preferences-heatmap-container"></div>
+            <div id="preferences-chart-container"></div>
+            <p id="preferences-legend" class="text-center text-muted small mt-2" data-i18n="preferences_legend"></p>
           </div>
         </div>
         <!-- Certificates & Accomplishments Card -->
@@ -1029,6 +1066,7 @@
 
       positions:
         - id: "devops"
+          category: "work"
           color: "#b3cde0"
           translations:
             en:
@@ -1052,6 +1090,7 @@
           end: "2023-03"
           skills: ["AWS", "CI/CD", "Kubernetes"]
         - id: "apprenticeship"
+          category: "work"
           color: "#ccebc5"
           company: "Company org, Rivertown"
           translations:
@@ -1073,6 +1112,7 @@
           end: "2016-07"
           skills: ["Monitoring", "Bash", "Linux", "networking"]
         - id: "volunteering"
+          category: "volunteering"
           color: "#fbd9a4"
           translations:
             en:
@@ -1085,6 +1125,7 @@
           end: "2016-07"
           skills: ["social", "empathy", "responsibility"]
         - id: "secondary"
+          category: "education"
           color: "#ebd9f4"
           translations:
             en:
@@ -1097,6 +1138,7 @@
           end: "2007-07"
           skills: []
         - id: "elementary"
+          category: "education"
           color: "#f4e8d9"
           translations:
             en:
@@ -1210,6 +1252,7 @@
           viewing_example_cv: "You are viewing an example CV. Please provide passphrase to view personal data."
           open_file: "Open file"
           preferences: "Personal Preferences"
+          preferences_legend: "Display of personal work related preferences."
         de:
           timeline: "Mein Lebenslauf"
           skills: "Meine Fähigkeiten"
@@ -1233,6 +1276,7 @@
           viewing_example_cv: "Sie sehen einen Beispiel-Lebenslauf. Bitte geben Sie das Passwort ein, um persönliche Daten anzuzeigen."
           open_file: "Datei öffnen"
           preferences: "Persönliche Vorlieben"
+          preferences_legend: "Darstellung von arbeitsbezogenen, persönlich bevorzugten Themen."
         </script>
   <script id="custom-config" type="text/plain">
 {"salt":"lJVisVwVA8QwkB47IQ2LMg==","iv":"wmk8foSw7c2aOve2","ciphertext":"bucU71FB9FJtUxFgYzxO5yEQ71M9soFoL5zwVZMfkj2dtrjKhjlMThBWBRfg4EV/yn4YNrfesYx5tDsfHA7I3lNuJh9bPgFDe9QZlNrA3OLPf90tIm4abMP/XdMXCGxYT4zWpHGlKeBdj9yPj6dWvzONn/m2G5pBvXBeBl7r/bbTeQKGOCAc+bjd6JmkbZB5Jo721qq1C9eOt2sjKDVPub5RL5SeWZlg+boyc8/dD3b+m7ZnP/PsWyrSN5wKkFBVLkZoqlQNkWbc3yykBbFf9u4+WYGEXIYLIKbvdXx+bPdXjviaDz6YYSqwXpaO23mFD22D5BtWjLf823C+TuLMNfn8ipFZHXvrnc2lbeCoGn9krwV1+eV+3AqpLbT1Vq+s8ggSKpPlSUP58nPo1h3jl7DTqw8iTGLz7MO5uFLpkWKTXJDLkVqCrnqnvL/M+12Q14A8I8Od5idjt7AakTr6d30JxaPiAMZL+iRfi09iA0HS880SChZmJw5t/LIRrfmt4ZWsEiN5SGrcIsc4kovDmSkjifVr5UkMddcWWz8gta8jLZ0yZb+D9ZU8DXPtXJGt2h7Xufr61uuVgmX2TiQO+fUNr+MKVgSmD/XiYRediypbjXWGd5qYGCHxNEtJrvAd14UxaOmpClegVPnFTz3HJkyCKUka2e0tm6xi2yTzE0zURRsyxMiEuNSucDM7X519E43nGtUXrxqZlVSoTB3CVKvTTi2dRWF1cEtTbd1dS93GqrzJ5crS+9zvADQfPqEzTYT9hRltqRA/5itwPZ2TNh7cktIB51mcC5t6/VHxYjlP4IjTl6qU4f0NjkHhEiXLbaON/LAccZss7fSun5qtCoBXlmdXgqDwcJqQS0ftuAgr8ukkgxtgkHOTFj2FpAxAhAD7I92nm3bgbLjPNMQDA7ve+09JTQrxC3FLsep5uuIKM+fYGHHD2tug9i1H+jE21+UbdNCRUgw0nCvhJD+3oNNGPDlklFoLX+pHlhMSWdHGCarLoQkVta2yGjuLo/zSzJm2ru50vjMGho+hnKfoeEmXuoz9lpUHBfmG09ABJvWK/CvECH5bldPe6ZFRlGmMn7KwjPpRac7xyrpXOkfW76nVOfkf/Mui/pvo+fMZdudqAQnzBpz3Qc1YZzpXf/k5Qa584ip2Uij7CW5xynghtbd40VydWvMVA8cyAU3Zdbh8h1Xqi49mxwCqFOqZ1+fGcCJdx7crPyAq5yEZi4Pq2rUM0sTXONU2i6diud8roHw5NJ/b8Z93hapDW74h6ghGvN2Q98tzkcOJpRzk2ak22YCTC+P98sKZDPsqPzM71Fggu5ZkTWyOKy6HReZO6ic3KXQfHD29YEQloe8b2YnVTaKGdTfy9KtxAIEC43JOvtdBjxlcFmuQmBOqtigFGW17XO9xiAowcTrERjyE86EDityouemtE9q5oZtLqzut2GiJteuTk77Ue+hWAZEBn5FlvgyFbyRAhosVKBZuDWxFLZWmLGGG23l3cUMEF3LqiDLFjMs7e/sCA2PxssYFQfwXUE0eZL1h/U1KXz6CQJxKKKllSBu21ifOHfaH/uv8GVnvNPkRMMJ0u0FQdiJ8It5JzNd4wUHFwMNeaWA3KNBnOlJVEz9wimHxhBuOKwcyoqNo8ddyA/TwNAeH1iS6BGeD+2OQSS/QKbHNmuLppSxqFQN2jMnkJkpXeFxIYLroqJWxpgT40i/QP3gkP27I00TDHGljc5315QlroLRfIlrHr/J+udeE1UyQ2ChSZDiHarTWDLMI6R6HRNZ5yaOVXKNhWd59aCrDyq3VU/FrZfSx5toMnqYJyZ+vVaTMEkS7S5PNoj8lh6vI9KOUEJgmJse5JCw6FkTvbzaPrifjh7x+cg7rthS8gf9/lFvnrLEn8OQE9D/V8aWgsB9/s/ybj7ntdcRxgOFCu5USP8Up571tv2aZScCfbP5l1Z/Oh3BCxaWSCcl1Plv+fFQYuilW6q6v+YuDkJAgVS9iUscwJPe6Vzk4cF3IGRqDFVhAaZEptG/ayP/WnivVkyGynfpXyXG+IrS1atgI+WZsFNr0cKq9ZNKSmKlywE332PjqQIc6CuK9dC0Vu9tO3gt+jjmQxyfb0fbzdU86Zgt7Xp3h0UfF4n0OtoD5QrCbGY1x14LqvUpRWdOe4SJ0utELBYrggFMf92DAPUR1FbJL+sYVWjsVCmml0q4THnhqYxk0Ak0IkbgVxdvTvjn2n2WR4GR6pMWZxichnAAqOjfELHPzKSqETjquFe9V88pTI/Yl/Za/IqbxozuBW1W50WB5qikEqquv7oPdzLrXAGs3WD3WT+LElCJ1YcqXDj04sQDFXQNJXM5FOUF/ApTpYuJABXG3z7AFFfiAqlCMnlGmQFfvRpIkGI2XTYoOrsPOklnEmCCC4XlGoVHHPGezIZrtIC8hf27yI/5V/Mo4fFEwO6NtG8A1DBvEyzfUNdaLa8JIwkAuSsVGltsRsrRQIUwUEgTgyW2wMM98wr/Oju5TqtU1omcaYWPynPqHaQYMNiiQeHR7BTSrCQPEh9/xRCmlXrfC04fcvy1soQtaXX2Kz/xBfo79Izv4lb+/cuUYYEwQixnGwcPvzyHjUZI+fiiyosXg43dOxxYQxuxppza5llfhQan8RB0ib7Yg2ty5y9HVcN6+YFAXeF9Vax7miDv+c/cxGhqfaO4Q+oAnM44Lh9AxY9xVruIs7FR/31jXUSNsu8oeECrnAar693v96JczikylAT30xHNFhC0h8UWm+k0pmWARoZNq1fj9Np2Q2msnibikrFznHlPtkwE59gZwmx2ua6iH8l92BCJrySul9xDyr1zfGNoHXMcN/lNAt07oI1eGCP66cdpwPeY6XbAKvIr6BjM52DLlSR7LetRW2j3vytV/xZ2fDqe2rLF8dNecRf5TNlGNeZ1jplL2tCkav1OqolulTtjdDDByDGKwcuOtAUULMic+y0DiGOjgPUfppIiCwdeDYjRWpLwnNtySSPSYKs/VNSpUUtBUHZHYyOV886s+QltMkoqWAV4S1KP91WMtzv138hRzOHyYCYjDwOSc3vsHPPU1Lk6usaWf1Bpj4vKodl7rplCrJDmYDzKDr1vuq902PKvQWXBy6sK9M9cJ/UlydWdRxNsKXc4q8E/THCyc32+NTCxQBwny4QkggF+GgugJoVsRgIyt2uc1mDIeOuJ9xwrKleDdZNe3qPscYFOKXrxAU8XESMKFRXRO1vwIxYoAnUtRXhmTklNXY8nlhc6WiNM16sn4bs2z6A3U4BUz8UbKxaXtbd200u3W1GTUFn3F3Ln0+YB6yJ3FK3SzJtR1fwFmCi5ANBxtKl5x/DBr+QxX5GeYd9/YBVgTSIWcIsEfQShMWDk52du2AzDq1f8HHkYJsr1kSOfCeFNCdagbtNKYYoUdmayX3oi13c2ZvT+5RLobNT+Jk2Qrs8Qr7qTCC1B15WnmIfGm+cf24Yck7hPLvH1P8mwOU2oCtQd7+nYHNYmSEN5yFS+oeaogUh+JCGUB1FqAJTYGDAGiIB74xf+9bQ7/vFAakqBXiwis1p1mghDelh3QqGuueTv+qObBlawRFJgXJHAY4O6KTp0jhLr9TiHAlTWnzS7T8bdnCHR5EnyKscYhOuXySopmYswwlVva2v40rkMnaECc1g4Ulg99SoyjUhLX1j5iGNt0LGKc23b6AAiEcE0yZ7FUL03XtABvMbOrAGWq0gNMXBInxut1rqaT9V4JWgrCIM1IE1OkDGslHB7QLIBoHRGd7CT6qhfjB+nor47DDYG84oi6Qt4002XakKvrOfE1Irc5ajSfKqslzwAUIoR10qFSfmh3WMct+WO4uzhQFbIm0oJsuh+HY6FUCEwTGtRrvloypFc9BPBm+zWcWCrhUU8qHdsQKdEF0/eRN3FWbfVO5BqEz9AxglwJat6GukIq57vrSJPV/Ut1NqJFUFMiGsA3xCFcRBsAFaUNtFJWZGeDgBXmB7eug52PsWzT2GCA8aMwno+kDnDkPvCFKl6l86+qOAdSr5TU/jT8y0RDYnOdgnQ/aO7VHeD4qsMJEq4M5ItrXt0D7LrGNAlB7ud3LokxKcDgscHSrelIlqm5cOwXKG2HLAVAfVRqZ84xu9VtFeH/VRGJqA9QGOGFqz7I1S5QyNNhpf/i0IkRpkKXCyQ9D3MljAaR68VU0NmEhwQd4UbEXPTf+2lwN7q5R7gvlYbLR7uU1Npcz45XdIMF5ebr72PhRXXhNQH/EdvDigq1mXrLhSiZ1IXA3EUEOAVtxz9Xf9COn9ritdy7LsIx3QwMX8bbaHtKJohcyay0gi/UsBOiSujwE4ufejI+uFcz+e39ocaaXdqbY7MNCinP8vH87mYU8V3xFXrv8kUDnIUwDc4WBtXfVJpu8lnFe84oyYgYos0QyggWhkM5t0PDzkxmF4fXo0VcWOWoi2eXhEDUBsxFPWhpnHtpFaEaeKMpCQme8ICVfUul6Mj+WzyGnMk0pIHM00uJ0ruZTZDlBomD/cUxno1ua5kYYt8HwYVcBY58XdB+x7bmr/Wyanv8///qD4nOenouvT8MtPXE3EmK91WY/xPGQaDCw3EQ/Pi3i/q3aJwjj07w15Ujw0SYLuHDfVwGV2dWZeDLJOPi+BtuX4tp0/UxaGOF3p92RwXZyTOcSQX+w7KCBaOZvUnt+jIt7TMYxqaXeXCDOQ0LlqdD1daQW7hIhg1gtr8ruNDcCaxI/s9WpRxgfUzQHftTeJ1pWl4PUiO/XvXNhjnILvyFRlvhdHEeIVTtbZAqj1SUawkmkiMOkmMBMjD38sycVMhaYusZVmUa7XlWmfxLYl9O/d6W6RhnWbBmurBre88jZNswScXe5wZZlu8xfSMO2d5Iu6PnwIAlBhPQCLwA46JPvsDX+NvF6sLa1PlfrM8EYzHWPMPsC06nsmQi8vO4sOy9Yj0dv21Ar1fjVFo+lhUps2Hlt//spf0Xxir3+sj6XyRb0UHS4C6S9w/6+sH5rFRbIuOUgH/WLqYhZR+wI9AyVCNHNXZYuLmTIo42kIkeGukTr8HXCuiga5MJP9URue8X1XE5rAstny5MZrU8n1cNFgLnZ6CQKzJLvr6dFKVXF2x1e90gdtVXyTSIiEq4NFw3sA4uDnoeJ7xTeNmkhqdTvPQvXc0B2UUGCgHl269Fu394oLBbYdNRdTdGYbKo+or8hjmar8DIem0JE/VW/xPyk4HWf6VGo7ispEqPfq/LI9SVneTMQLeppkaVgGJiOMyV8a0Jd/Aq0YlruNp8hP0BmHKfloQUnZP8R5uvpLW5yLe4rQSBsJsyY6sE1K418w4W5TIsR8NpyFtwlPySnw6Q8iS/icIVvus2zcYJ3oULekUXomU24O+E7QxrQpWdZH7QjAs7dqqeguTkBCYlC2UuFB0QiybKksd5RiFQAoBwcVa0l/GRc/e+yrfVWtQ5c+En+NrC4PfInDZGaFrKbySqCieqNPdOIkNC7pzlves4y8xOiXT9uqkcSBLpdoX63RghfA1MavuCChXy/sGwwlhuLr8Wi66vqO5A/t4oqZW0/LGNGvjw8XbWBv38lgjTYJei6no9SkyxYbdt/ERJl6zze9uGgeIw6RfTA1MoEdHyNjlQ8v1NTsn2mwFeQMzlfXR5I+dn/i0HFEk8emYCfx5Wzq24+XEeUuZXgZ2UXsBlTyA9gw72D63HubkfO5xyEXglEWZ74auxhiKd3sQpw6nAr0hvMRKO0u/+ysZPioCe/r++2Edg8GDF78ZEBBiFNEV+RKGOwCFCx2yTWCmWNH0U9VJYtgNyPoonlPeQjljJpc6+iR/uVP/trJ7UQPVbrmlr5Z00aKZS2KU8NbfmU2BPqeQEekO/dVTuxuuDfSNrmj0c/HJ+KT1VjaHqyg2tBy1iY5i5HQSkrwLnjvYxiqco9/AuaBpEXkMbuSM0/K6F4sRRmmSTRXaSZb5ZYpN8Rwa03KxqJwmIqcmAMYJ8Lq+QZ8Pa9yaLgTX3zUdRKCbZ23KTKq56BhB+tnaSegCNajgUuItRlH8l4ouBSTm2Z97AfNPu+W01O8Ykg3C4/f02NaI7CC4yZ1owmpWCtcb+S+ltqOmfzd6kkWLYfUXVS5+BjR6qS3GOtxOzkNRRrBQBrOVGXVrFpQ5ZDh+n8tB5hZF8UXWgFP3M2GRSX0JmPRE8sHyjwaO7TQrAVIFzokRF3gFPOW3SVXZ4cWLAEnBfXotXvsGkwG+hT2lvgaOsTA8VQELjaxbs/BrtvdhBc4ZrkajJsawGam7sZVdmgACEe+mLXat8+PH5/zPS9Vv+zSr/IZlJDmqmVGEOjIc4xL6CnUORaF+3FEbiU8Ua+/Ysg7uEQY0uOlG2EZFo6P7prEd9TcHm7/uMnKrhjybRUzvibq1b/PEl3T+/xVKHaCdQqfnvMq7aDtXBEC7jLkyjkbO6ey+XHRLcMqFhR9tyQN6YfbxT986Em7tf6Yj5HF193ORR28tFMQ6++a+LH7dLJzYGdTf64uOhUOOPEs22u82KXO0ztaaE9yI10QXfd4wmDEtfdchVZShMiWgkCfPZiXPjn4H2p/JQHKZ4872EqQaYuaud93IAnnSKOUd9gadGcYr1j5xsq2hldct4w1FG/fFzGGnQn+hMqfy8ZP3+p1tkT4O3Dcje2Mml/PC6LI9MQCNKY9q6/YToSZpcwyaNkQU5QYeeh5RQ4//WYauaynSjb2Su7UlhLPH/cYgThbECbiHHZOilytX1JsW7ig5aS9FtvoUQ8qvptVOeP3ng4lJ35yNDDYhELV7H4rQvAyhqia470kue2/bGGOV7rMkyqEcsWmtvAbR/joPmEG53WHGIzuudknvrFBHyuiZJVxRMFagyGPwUGG2YXc1lm+92F+mcYGxkbiFidPOwWyUOzFVt4DIbdbwgIDdVkjRSTDpqE7AghjwZsKkvTsFviCX5MK2tGg08UGvE/IKzDabrIWq+IwCy0PAzWpr6jah1UR34+pqvYpiG0jv+q7lakf8QqJzkc8vczFaI2nQjgf016s0RGq1M3M9q2yvEGl95L+18e6/825eaGWhQYh8PmmPSXKzcFkBOga0u5EEF/3Hg9rTiA5NTOMdok8XwfrFoMcbgKHZFJGQcoPVN+P3N1DFV+EiaRH5Xk3BxTkM2OsV5sv/9nsLLQIzxgy5dFTptiJZk84wFNyNf8kW441mBA1p4EWHfEjf+O6TDwc+qWhMvgBLYxkTtGETCzCnbonfuGZEzkZPOa2R/mKEIn6pRM/MmJxIvISYG22mffOr+Kfng36HmHoNQCcTIeWfYzl6BswyTbF9pQELvoB2fVVInwa3ursfV0hZcwp0kFEYgQqnEDyXOFwJVhhDNBq84CmvcGAA/wN4eKTYazc37I7zBE2E073cyEMhnRRu45cv1C6rDGIQq1k7HXq1BsELdVX8mLP9mHjk1r11SnCyEeqKC7i0mlzsA59bv4eN9icgNBhMXYTALiWE384TH1lGSp2uXzQy7FOf41NzIXRbUONZg8gmF+9Xi14f04qKnLYZIEb2ZSBgVfaniolVK+pqAaV38M6/Dk1LfdkFGUF4D2tqUbgnqyhMLxuQc7/W4Uixsa+/5g7rkLc5802y4AxiQcgBLHif/6dXLNxckeMsq06OyHl/Wxzy25TCGkGFzRH0xjVVlRdgfUyKkmBrYqONeisQaqOtlVVsk6TtlcqjViqBolsKZ/wjkGFGup0d1umFGQAMutzsvr8OZrrVwf3ET9yW17TjpwJa0b31C/cNMtHMHP7SuN6OzM9PZNVH3/pYwwzKrqvAIWOFD0kW/wp6Ya2Kk2tq81fU688S15ZQRdCnA/aDv5hoZAZ8jfvwibkV/sV0KtU/2MOWKritot5lph7nh+fJ+S+Cd5k8tIzrPougT8kelCSZLgh2dZM4IPfI91EtyQLn3MxWTU+XWC8J/XME/+Flg5+TkMlp2G5IdrFEZIxtGXNBaW5OudXJx1r3hsyEhIfy6O7Wh1JlGXFztUQ5IJKFg0CnqWHKhdVVNEV3NuZB/cGAzeP/k67qsg5F48A+b91Xn/OQ5FRfCEtLf5SAGA7D3tdU87wtsjmt0OqaiNmj8pv561REjIcr3E94BQDkqQpMfjYR/rzRxRigmvMxPe6G5QUKLKMiEVXsJsJEucFCF6i73IMYj/ADBVOW43yg7QCDA6VzKXMdrVYhnzSJICyCAsVMC0yRwaGeoBOp91PLPRnzWdFlNeQziOsqcN0J4YBPAhEcQ4uN3DoxWBZT6B5zdBLyAW6FEgP8UDngC+zoC3aQtiUAJEldW0k+XyAQ4+8LWvdVpYimfzbWqykb46wWI9nqi1klaBebQ6aBhW7dSiSGm0Ka3/UwaGhlNnwZ1W5y8Cbu5EiF5vwUbQa2URvlim4e+agXq4ja9djL6cHW38SqGefG8sPPywAceX5XXOzGzXQeknE6xKXwhp2VtDBaaXxAlhU2CR43hROWWHvvKLEX9P6sJtZQAUNA7l24SIYFnzXXf62sqqpPf+u6OQvTJOsGgNRj7rckfMNbIeEAUOEy2cSZFmXGinAFW46aGSvjC23QV0RKfLgZVnTLHlV7ThD+JANldNmD7bWrkRdqfir3L3iIihQUMvl1BRD178YI33OhSYo5PwIxpIPyBm6xk5rmbHsSZqmyP9Cp7+UixSevjR4pnrRt66VG65CjuZWqN3tL+WG2Zo6kqan7k4wC7X7h3snBImQ4qfwFWERkqy5ABb9wc6BBAyYQ5gEctKjHizUXNWDuYTm94d/0DVCIx9qgEGuJnOlKD5JXaayKdzXsU270cRJdYedi+q7vJ+RJBlFqKHtQnace0zlWrLLAsfYqKr4xdQtwF0nYb2Xnl4b/9+sLITstmwGd3h1ZjEmbHmOj6iClUfP+55YBR9E2cKK7u009sC/HZ+KVJ2EfH4XXzGq7rRD67Z1Nqkc6/g1OTNlo/+Zzns1j7seL9N2t9ZMi2nGuP6ulJbpm3Kz2qFXMrlNNa6iBzYUnD63v/TUJSVWEZCwvwymv4Makqj18SD8UfP/5j72/X+mwX87zUMYqqT81kPS6OzvpQhLUt7CpSo7ZLsMqa5PEgH6w+puLmSFx17fOO672QZaCn/QaaH8kT7ovv4ZqUk5ntcxwQulvk1TzlsIqMmaouCxwGX9El/TzfxTaSDd40etmJtyeMIMTZLj2ZYx0fLDcbiXiM1sSid55YzNhGVHqb0ZOeBciEalqBSpO4dYlliGNio7jK+GWg+BiV9j7ZcVxB7VS1zjJ5tFgyAngFkaNVEi9dpIkCbTvyfK6HbvPbIBsXrZ/w6d2POs3/eGfi7Xf5JAK81HiDBRR7o3V2grBIZ2+wNL1Gd13OTtc8E/IlBTHJpIOMRhaNhvP+LNSZmMjtMfo3dfS7TOeUqtzN1Npqoe2/llB0EJ7fgWGFIfIZ/bZLVpBtwxVs+F5cpwcTV8NVV6/DutI68aqOCSAwGWpQRb2eFqa0JADh4SnnJYGeXZxLDF9ejt8ajZMEzbfakWvtBG2XmMzYPtsA9eezTdjSNBh4fpZBocV2Cby46mFQWR90Y799k8mK1XWUolRjnFj3nE8g/Atwyz3R7sLXpY0oZ4WwTsvhTCEo8r2vIJ1xqrzLK55l+A0HHv1LT8FwuDj7wh9SYyk9MTiOz/0MXChZ4VsZvRp/2GBVV1oBIUsKG7SK7Zj+sW7yM/I6OeDjoWzQFVjAh3WTkTnPtq/hQbQqOJPThsIoQddihjA7ypm2lx2wWI2YHVCyuMI5bKubFblLZzjNAijqpNw8VMw1qMwVTnR0lBwyL7/leNIR5r2lOITmxGvgoFWiik1livY7+CtyNAFsyh8TKo4Kz1+tIx86R7sxD00QJVJZ82vmqvWqJE/DvwhJks7mke3cbBkwHtt/73fsIFJjo4kdi3zKkm1gA844DGtEIdACbWC1NQr/ElOkUquywZw4fzkemo46zEQrKc/hZIMybiClfnTXmIb0yvg86qwlzXqsd9o2FAf+SlCqcwoyWuafC02whL4Okh+a5AAX6nG8tHnQ6PIZLBFj8WGCdkPJHruIhl1UkIs/tbgw6cipsVPnqqDZ5qdHjBPKcZ7pwYJaBormEnovKqZ7LByYLHZOS4Wsph4Pbl10AaYbFGZEsEXel+It6bx12PQTmFbbHvfaFyzY1668qG0WrK7zkdT2lXxBWEvfJ6z8V+34vpjEIXwrZaR4OhSoyssCHkh8hMEOkSTYBmJ0/0ufThwCYigJnO9bovKxCIF0CseaOhFOPLTsFGEIHSRA93SXjoyA+bNeeVgNBpaVTyAPA1IKode4gCvKnSJv/3o6vhUyd6hrmDzWu3ROhTjEJzi2uGA3dvfJq725UHdobjmtN1LE3RgH5hK8Tt5Gknlg1dU0BisEJbRIzPEviZM5v67l6w1o4II0CEMiCF47rc3nQMOT2XO+kDi036F/CCmTsbPslCu/zI2QvocUr4BvouS7icBFSycbQuKvtDngSefT0/dntNP2q6Y2KAi2TEMa9GpNaoaTX2LKJeMBrYN2/igHxvVBZsZ/PuveIxz6gAbvMD5qoA/0N0iN4z9dVq/97WSRX9IoRwdct5z+s+cuY15LB869aA7wPWuYqQQK+35FOK3ocaA22ZpG/K7IiZO8b+SUqLLLmfYt434S+u1HOz+jqYZpCKShq2WRB7LsRZWnY33l1TQlhlmoz4sGHt/xJ0ljH8v/38ulJDW0gtRb4kM3bqmwNrNSBM1qGue74Nl09hAli87Vmo22JwXpTVDkRk6fNJuFlo+zUsbTaAtGVMOGs9xIChQ7xBTRwK7wSQpkSqkdmPTXdNN77f8DYJVpt9tHh7n2bEDZq0WKam0qh127B1ea7C1Vi5/AvM8rTgCZl27FFQL1+XXQhb6hIAbXunmB6LfTyu6zfXD4qVb85E8jhsvo79oG9HcxBmHv86kiGRKrYyTyztl8BZed+6RbsJXvZxORwRTJw822uVx+oTCVRvyU4w0gesSe5zq+LX5p73TCC9KlZQeADL0euyTw2k1uekPzLWRV+XsOmJ7AZmlKZRUkgTmuM/40UlHAIae2sP8845548qiP/i3cYFAmhW13AzcUItlNpq9MV2luTfUlvhqX3xXPm05mi5M41UqccQiEngYd51s1muNTS9NXYaeJ0rRy37xxqcu0dk8+JKO3OI4rQhzDs/cYpPZveJkAsZwv/tPyxFRwcQSs3t8qa5WGlIGDtAywLZVESSMW9C40EYwwM6Xf1E1zL2mjnfmOsFzJClkzigjI5D1fWS3IZh4oiAENKZJhm7p66LM5gKOBE/iZCC3SfkyseN0DyckAeiKBen3JiljQ3P3iIphyQ77W1zJKDMMBced7xYl2PElRdrmlMLErz0mZu4Uv5KpCBI9pgh4aWkr5KH0v0o4qIoaP7QnwclRJ4XV61UlbY5oMD+61ScNhY3sImN3ykKR66W5RMDCrHSJD7favff3ElmJVvv5ZtjeeSZGAAVISn8F6SjOv7q6dk/YcmT4Uhzayb0bRSV6r+aTiL88zTKoXfSbyTtWatTYZMs1XYPajZyjiyzo7nP2WVE+kCcJ+dTlpg8MKOUa1DypI3eLopdreeM/LueywuKxpqkiSgi63y4McUcqg+XXLdG7LVOBtQ8PMevACRQCPLf+SN3MYRInM0G/v3a3PW4Q3l8xMUCMBMIB8fT4RCEUZOw2hV28vHX9Es3tiD/TxCfQAEoOxMl+cHG6ZCLa0YnpDdCjXq7rQIzq/9HcPIf3gaQJTC1PSTHxdST+klGWPPkvY8Xl2eVOYiZ+ccXaOO1S29r5Epi+lKOs0X5ptJURohvWetvmogIG+aNxVOqUYe1y2KjM2IJocCDjt1vFp0oWNyqJMMx/gcOH3EijSnWJJg8EACxqP/TahXKIRhrEEHFd6C6ijuaN+M56atPY4uzAqx2IKSa0Sa3ylC9aa+BTIr2d69+BkXsZCqWGncZPetRmKRRuaFdCzhKHQr8Mzo6hRfujmTXIRgRX+LjzaJR169pj/RXhjkj0LJ1pVkP8ZS1btsLzwr3Pe9Z1/fAeuLOHMp7eoQVBxdHfQiICZv9F4hOP3KpW98orOw2SiTjHT4ZoTjp1yMlXzixnpP4B4L3DtLvZSoHU0P5TH+ty7iH9Urlb1ShSXl6iLr/CVViIScks/BB/JZkstWidNzOAzdn5BOhcv/XxXAU1aC6+UxEcP3TB1cfMWj84CeUwn3JPcmPQqKLwPWCjnJTEhdSNGPBgxWqRdpcVYexDitkyYUMf/zdgBPTPPVr09RMi4aupUlpbU/z7o/4gEQywQQzlb7DwhPRlSCcWXrd4/Gu7st3EJMLpw1NfgzeqbvKDt1/SKok5mnRkHKkbJLJFdxlkHJ8cAxuGVh21xW23xh/3cSceGu1XT1sVVZWdfqEwi23yDqIznN1pJXmlLKQBsHZgJaNlK3SwrVav+hYY14r+65PdpBPbHx4QIWI/wdhlJSAvKX3kSnPUo0yk9hcCrXgzcdtkq/O7HYUr+n5LbTamPDXo/0weYzZhSogkVwpp2LjNpkgFsBE89D2ZlLo5UhzeUowfKkZ59eR4D5QKCI0SQX4Ca8yHcDos0/eQwiYBI6oBaYBgeKEs6BDRL6z4XqF7ecZ3sGj1Kihc8k9orl0DN2GG+swgH2cZdWbO1DyLW1yYgwgH2fSwZoIaKp9bEg6CYp/vEwYR2gPWWaXUjyY2IP2S/2xw15MK4Ow0jjCxhnYA4AV7G5QQ95aIsepGcxyt3JxxHOTYdn/3MsGCwoElqiSswDR61KZx/1ydnN45wY+Ctl9M3KlyYHfRdnKa2Xeng2otBdG5Vdx9yGH6d/sC/xK7zVKSqPmJia4HcCed+64xjO6JfTqYN0a9QSgwNTwr+82uhJh4v+TBn1tK0ooCrRNvuxRUxemn1kcrYEDk1okpbVB0HBbhrpLnKjEvw34RBkd4GfbVbwAQerKKmJVY6R0WDcGihi+J26W2qKqmB7z31Kti/VfBZ40h2PB88Tpt1T1KH74S14GocclhCJ72NyblX/+ynEum/apRUatF4O4Vz9iA4M0+OrCy4pDaXsT0JIAU9YkMgLE52vNvPyOeI1B/0lO7FQbs8htIK1N+YmD48jb7j9y/6gNxN3MGpyi/ZuWIY3a9FdGyqupBEZURVerIluIQxRW5FlMaC3TJ07twcxFNpUr9qjEBw7Ym3nwz3OCk6wkuq1pMTwi7q53hDIu9Ulxjo94OzmD/g/el9sZNXLWn59DXwMiHdHjD37hnkmGvnvHLBuoYmDnj/jcDOd5C1g4/BW7L9U4fRNKxqtmCVfo5/2kuOaNi7bAZO61N1J/qfLLGhDRme6wpoujV3YtiGmMTxFp4uYWFVgUZ5UuAkEgrjfWLQFEK6xBdYvcXaN4yOYSfnP5r4rwJHREv1XK5KA8NQDq9j3grq4LGuRVUc7BhCSWck9fwxf/w1RdF44wceAqgAoy0Shg581mzLTYIj5EShu5YKNe+/E2CRTQk5asYIqdt8QQ7uNEZMyTw/PcCqkHam4MY6raZxJYLfGg8/Z5xTKiYFxx5g52tqwYDCITxo9lr/X2tCP1F/8V95MTplnCP6i9J52ag+ElBtA9fWX/WhYd86Ge6qSVwXzkcNSvxgulfDLARr2qNHKHjdvQTB4dv34qo4F3qr/31EvdVqHs7rHb+pn/ugRwRbLHrgFFGUMo2MaZ3EWLGADcOPFhAdbzpVbBnUVE1bk0D69ACNIBLzwjk4ya1k9EHGSkZAaE32mnrptk1IWkJS8dMblW0Pq3tw40LQ/djmxs5GN97ih6h+y5r8GCj9BPSdZguFecFgvEwwFEXu7Zf5+33yDzakNFsq/eO35W/di7D2SL5xSjXjHlQtjt01XdGz0VwLjGEdzBgcQfWPMNH/zgTCFkH2B4zhVrSdYFT7rQClxL+TZzCsOAjs6Zl8Ee4efSRa+VdyTE9kPHbxYm2CGZhGZKSixv4eD4ofxf5IfRiiVjUXNcOydWCi+b8ax1vVP2j27xynyYpnf0xTiodLq8mkqy3MWBhT0XKm4AxB0Cmbug1Y7ZcMxTmuGFJh1TpXX1SXMN1xr+XJXc3dxNGZQ/rcRI1Q/kRAeqI4IbHOjquIeBDt2q/LYjiL+GyQf1RFv4H1zIHI4itKnxEsAqVs3YU/TQi4LtSic8LX2nqEwIzpoQuZfY73VSv3hNhwJ/vM2GM44IGwI2vIpE1OpgNm1+TXUvEg8o+lZJQ7uJcjBEteXoo/LC1e8i/AWMtLaHlJoJbhRYuB5raUJeDPfDEIqTiebmTYccl5lXytCB/erlUzF6RqJZOEx0fDyZMeq6045m+ter34dWLB81ZlZdak55Kdgvi8TnnUAaDryrLLL7xt5WZgwB4W6z09i6Ogy5FBkF4zBtWA+iXWzxnPtpLUvBueFc57NCvz6BvQw7WCSIxI+YSSlO9yw7kkWGVRbKpPC2kNj7NeMDK0gqZICXqlwL1y33gVFjntGzYu0ci4a0e0s4Xt9QH1ysyS6zBamH8Cc1zKPvp7IM+8OjB7a3isfS58iMsZRHHAeWOSiIiv6dmE4C6WkvKJ1XLUva+pqLMmBKonB/o1hipDIRVUCWtESWik/qGfQutlshDC5dm9xICpXkHukyaORDLJiYAlQMeSWbOXGwv96fyC+gf+/ZdovQBXGIl+4Djz/xvPOv/jmwcaXxHrMTsSMK2k/6md2OYDd5Xtc0ScBHRKDC6wkQ78vJZu+AowDtioaEeDZEbIaAzTG0UbkJwJOPNlDd+IPZmDWAPEE62s8wBG5xpm3uUklShxV0HVfsduLSDLo9k+7TXkLv6/gN5MMuDsALOYylkhZVhN5MC1zWPQezpBKZx5HQLPQbUca9t7nk53QcscuZGXU72eaYSEjnNp/ac0YvG35K9mOj5n56AJt4y3lbi/4Eu5Tzv+KxAq5/X9GMnzDmpiuZubL7hCvuQnvtWgtg3tJkfCcQ1ZSdsJaCxUgTTiYfHfKztyyJhAmBgh9cZesxwDJSkMO+x0BC0cW8/BDc/wajgE1JIUDjymcKHiYAypVSdRG+nWWHEw+Cd99BCrmhETXI5DM9QIkS91yF4LbPwg62Z2zEHMRVrIRBQ1Pn96dm4Jr+ZMjwPXnp2+W6fJzs0cOS2VYGj2T+UOYvD8fUSsUbAoXYzStZlslCXYyZecRy+Ij5oWgqFsBqRB5lHT9ZK6dVk25vS9R+raHexJhH/KCDd7tMcafWdAltGtZwldhnaGOja50YpegYLy7oxTAvVw85d+8TPcxQqyv92uxBYQa6DXtkzbhfLqHjDzsIXghmx833pd5Z5FuMNp5xOW92Zboq6dTaP7KPAcQQ=="}
@@ -1470,7 +1514,7 @@
 
       // Update preferences visualization if it exists
       if (config && config.preferences) {
-        const container = d3.select("#preferences-heatmap-container");
+        const container = d3.select("#preferences-chart-container");
         const isBarChart = d3.select("#preferences-view-toggle").property("checked");
         renderPreferences(config.preferences, isBarChart, container.select(".preferences-viz-container"));
       }
@@ -1478,6 +1522,8 @@
     function toggleLanguage() {
       currentLanguage = currentLanguage === "en" ? "de" : "en";
       updateTranslations();
+      initSkillTree();
+      initTimeline();
     }
     function updateColors() {
       document.querySelectorAll(".position-card").forEach((card) => {
@@ -1551,6 +1597,11 @@
         card.setAttribute("data-end", pos.end);
         card.setAttribute("data-company", pos.company);
         card.setAttribute("data-skills", (pos.skills || []).join(","));
+
+        // Add category badge
+        const categoryLabel = (pos.category || 'work').charAt(0).toUpperCase() + (pos.category || 'work').slice(1);
+        const categoryBadge = `<span class="category-badge ${pos.category}">${categoryLabel}</span>`;
+
         const { normal, highContrast } = getPositionColor(pos.id);
         card.style.setProperty(
           "border-left-color",
@@ -1564,9 +1615,12 @@
             ? pos.translations[currentLanguage]
             : {};
         const title = t.title || pos.title || pos.id;
-        card.innerHTML = `<h5 class="card-title mb-1">${title}</h5>
-      <h6 class="card-subtitle mb-1 text-muted company">${pos.company}</h6>
-      <h7 class="card-subtitle mb-2 text-muted date"><span class="start-date">${pos.start}</span> – <span class="end-date">${pos.end}</span></h7>`;
+        card.innerHTML = `${categoryBadge}
+          <h5 class="card-title mb-1">${title}</h5>
+          <h6 class="card-subtitle mb-1 text-muted company">${pos.company}</h6>
+          <h7 class="card-subtitle mb-2 text-muted date">
+            <span class="start-date">${pos.start}</span> – <span class="end-date">${pos.end}</span>
+          </h7>`;
         const descContainer = document.createElement("div");
         descContainer.classList.add("position-description", "card-text");
         if (t.description || pos.description) {
@@ -1648,34 +1702,56 @@
     function addSkillAnimationSwitch() {
       // Only add the switch in normal mode (not in high-contrast)
       if (document.body.classList.contains("high-contrast")) return;
+
+      let parentDiv = document.getElementById("skill-tree-chart-container").parentElement;
+
+      // Create visualization container if it doesn't exist
+      let vizContainer = document.getElementById("skill-tree-viz-container");
+      if (!vizContainer) {
+      vizContainer = document.createElement("div");
+      vizContainer.id = "skill-tree-viz-container";
+      parentDiv.insertBefore(vizContainer, parentDiv.firstChild);
+      }
+
+      // Add the animation switch
       let switchContainer = document.getElementById("skill-animation-switch");
       if (!switchContainer) {
-        switchContainer = document.createElement("div");
-        switchContainer.id = "skill-animation-switch";
-        switchContainer.className = "form-check mt-2 card p-1";
-        switchContainer.innerHTML = `
-      <input class="form-check-input" type="checkbox" id="disable-animation-switch">
-      <label class="form-check-label" for="disable-animation-switch" data-i18n="disable_skill_animation">
+      switchContainer = document.createElement("div");
+      switchContainer.id = "skill-animation-switch";
+      switchContainer.className = "form-check mt-2 card p-1";
+      switchContainer.innerHTML = `
+        <input class="form-check-input" type="checkbox" id="disable-animation-switch">
+        <label class="form-check-label" for="disable-animation-switch" data-i18n="disable_skill_animation">
         Static Layout
-      </label>
-    `;
-        // Append the switch below the skill tree container
-        document.getElementById("skill-tree-container").parentElement.appendChild(switchContainer);
-        document.getElementById("disable-animation-switch").addEventListener("change", function () {
-          disableSkillAnimation = this.checked;
-          initSkillTree();
-        });
+        </label>
+      `;
+      parentDiv.appendChild(switchContainer);
+
+      document.getElementById("disable-animation-switch").addEventListener("change", function () {
+        disableSkillAnimation = this.checked;
+        initSkillTree();
+      });
+      }
+
+      // Ensure legend stays at the bottom
+      let legendEl = document.getElementById("skill-tree-legend");
+      if (legendEl) {
+      parentDiv.appendChild(legendEl);
       }
     }
 
-
     function initSkillTree() {
-      const container = d3.select("#skill-tree-container");
-      const width = container.node().clientWidth;
-      const height = container.node().clientHeight;
+      const container = d3.select("#skill-tree-chart-container");
+      const containerNode = container.node();
+      const width = containerNode.clientWidth;
+      let height = containerNode.clientHeight;
+
       container.selectAll(".skill-bubble").remove();
+      addSkillAnimationSwitch();
       const nodes = window.skillData.map(d => Object.assign({}, d));
-      const skillBubbles = container.selectAll(".skill-bubble")
+
+      const skillBubbles = container
+        .selectAll(".skill-bubble")
         .data(nodes)
         .enter()
         .append("button")
@@ -1683,6 +1759,49 @@
         .attr("class", "skill-bubble btn btn-light")
         .style("font-size", d => (10 + d.level * 2) + "px")
         .text(d => (d.translations && d.translations[currentLanguage] && d.translations[currentLanguage].title) ? d.translations[currentLanguage].title : d.id);
+
+      // If static layout or print mode, adjust container height based on content
+      if (disableSkillAnimation || window.matchMedia('print').matches) {
+        skillBubbles.style("position", "static");
+
+        // Add a small delay to ensure all bubbles are rendered
+        setTimeout(() => {
+          const bubbles = container.selectAll(".skill-bubble").nodes();
+          if (bubbles.length > 0) {
+            let maxBottom = 0;
+            bubbles.forEach(bubble => {
+              const rect = bubble.getBoundingClientRect();
+              maxBottom = Math.max(maxBottom, rect.bottom - containerNode.getBoundingClientRect().top);
+            });
+            // Add some padding
+            containerNode.style.height = (maxBottom + 20) + 'px';
+          }
+        }, 0);
+      } else {
+        // For animated layout, use simulation
+        const simulation = d3.forceSimulation(nodes)
+          .force("charge", d3.forceManyBody().strength(-60))
+          .force("x", d3.forceX(width / 2).strength(0.16))
+          .force("y", d3.forceY(height / 2).strength(0.16))
+          .force("collision", d3.forceCollide().radius(d => 20 + d.level * 4).iterations(2))
+          .on("tick", () => {
+            skillBubbles
+              .style("left", d => Math.max(0, Math.min(width - 130, d.x)) + "px")
+              .style("top", d => Math.max(0, Math.min(height - 50, d.y)) + "px");
+
+            // Adjust container height if any bubble exceeds current height
+            let maxY = 0;
+            nodes.forEach(node => {
+              maxY = Math.max(maxY, node.y + 50); // 50px for bubble height
+            });
+            if (maxY > height) {
+              containerNode.style.height = (maxY + 20) + 'px';
+              height = maxY + 20;
+            }
+          });
+
+        simulation.alphaTarget(0.2).restart();
+      }
 
       // Attach hover events on desktop only
       if (!document.body.classList.contains("mobile")) {
@@ -1726,25 +1845,6 @@
           showToastSkillFilter(skillName);
         }
       });
-
-      // If animation is enabled, run simulation; otherwise use static layout
-      if (!disableSkillAnimation) {
-        const simulation = d3.forceSimulation(nodes)
-          .force("charge", d3.forceManyBody().strength(-60))
-          .force("x", d3.forceX(width / 2).strength(0.16))
-          .force("y", d3.forceY(height / 2).strength(0.16))
-          .force("collision", d3.forceCollide().radius(d => 20 + d.level * 4).iterations(2))
-          .on("tick", () => {
-            skillBubbles
-              .style("left", d => Math.max(0, Math.min(width - 130, d.x)) + "px")
-              .style("top", d => Math.max(0, Math.min(height - 50, d.y)) + "px");
-          });
-        simulation.alphaTarget(0.2).restart();
-      } else {
-        // Static layout: remove absolute positioning so bubbles flow naturally
-        skillBubbles.style("position", "static");
-      }
-      addSkillAnimationSwitch();
     }
 
     function toDate(dateStr) {
@@ -1752,13 +1852,13 @@
       const parseYear = d3.timeParse("%Y");
       return dateStr.includes("-") ? parseDate(dateStr) : parseYear(dateStr);
     }
+
     function initTimeline() {
-      const positions = Array.from(
-        document.querySelectorAll(".position-card")
-      )
+      const positions = Array.from(document.querySelectorAll(".position-card"))
         .reverse()
         .map((card) => {
           const pid = card.getAttribute("data-id");
+          const pos = config.positions.find(p => p.id === pid);
           const startStr = card.getAttribute("data-start");
           const endStr = card.getAttribute("data-end");
           const skills = (card.getAttribute("data-skills") || "")
@@ -1772,98 +1872,165 @@
             skills,
             startDate: toDate(startStr),
             endDate: toDate(endStr),
+            category: pos.category || 'work',
+            label: pos.translations?.[currentLanguage]?.title || pos.title || pid
           };
         });
+
       if (!positions.length) return;
+
+      const categories = ['education', 'work', 'volunteering'];
+      const categoryColors = {
+        education: '#4a90e2',
+        work: '#50c878',
+        volunteering: '#ffa500'
+      };
+
       const minDate = d3.min(positions, (d) => d.startDate);
       const maxDate = d3.max(positions, (d) => d.endDate);
+      const extendedMinDate = d3.timeMonth.offset(minDate, -12);
+      const extendedMaxDate = d3.timeMonth.offset(maxDate, 12);
       const svgEl = document.getElementById("timeline-svg");
       const width = svgEl.clientWidth;
       const height = svgEl.clientHeight;
       const svg = d3.select(svgEl);
       svg.selectAll("*").remove();
-      const xScale = d3
-        .scaleTime()
-        .domain([minDate, maxDate])
-        .range([50, width - 50]);
-      const xAxis = d3.axisBottom(xScale).ticks(5);
-      svg
-        .append("g")
-        .attr("transform", `translate(0, ${height - 20})`)
-        .call(xAxis);
+
+      const margin = { top: 50, right: 20, bottom: 30, left: 100 };
+      const timelineHeight = (height - margin.top - margin.bottom) / categories.length;
+
+      const xScale = d3.scaleTime()
+        .domain([extendedMinDate, extendedMaxDate])
+        .range([margin.left, width - margin.right]);
+
+      // Add category labels
+      svg.selectAll(".timeline-category")
+        .data(categories)
+        .enter()
+        .append("text")
+        .attr("class", "timeline-category")
+        .attr("x", margin.left - 10)
+        .attr("y", (d, i) => margin.top + (i * timelineHeight) + (timelineHeight / 2))
+        .attr("text-anchor", "end")
+        .attr("dominant-baseline", "middle")
+        .text(d => d.charAt(0).toUpperCase() + d.slice(1));
+
+      // Add time axis with grid lines every 5 years
+      const xAxis = d3.axisBottom(xScale)
+        .ticks(d3.timeYear.every(5))
+        .tickSize(-height + margin.top + margin.bottom);
+
+      const xAxisGroup = svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", `translate(0,${height - margin.bottom})`);
+
+      xAxisGroup.call(xAxis)
+        .selectAll(".tick line")
+        .attr("stroke", "#ddd")
+        .attr("stroke-dasharray", "2,2");
+
+      xAxisGroup.selectAll(".domain")
+        .attr("stroke", "#999");
+
+      // Create timeline items for each category
+      categories.forEach((category, categoryIndex) => {
+        const categoryPositions = positions.filter(p => p.category === category);
+
+        const timelineItems = svg.selectAll(`.timeline-rect-${category}`)
+          .data(categoryPositions)
+          .enter()
+          .append("g")
+          .attr("class", `timeline-rect-group ${category}`);
+
+        timelineItems.append("rect")
+          .attr("class", "timeline-rect")
+          .attr("data-id", d => d.id)
+          .attr("x", d => xScale(d.startDate))
+          .attr("y", margin.top + (categoryIndex * timelineHeight) + 5)
+          .attr("width", d => Math.max(5, xScale(d.endDate) - xScale(d.startDate)))
+          .attr("height", timelineHeight - 10)
+          .attr("fill", d => {
+            const { normal, highContrast } = getPositionColor(d.id);
+            return document.body.classList.contains("high-contrast")
+              ? highContrast
+              : normal;
+          });
+
+        timelineItems.append("text")
+          .attr("class", "timeline-label")
+          .attr("x", d => xScale(d.startDate) + 5)
+          .attr("y", margin.top + (categoryIndex * timelineHeight) + (timelineHeight / 2))
+          .attr("dominant-baseline", "middle")
+          .each(function(d) {
+            const text = d3.select(this);
+            const rectWidth = xScale(d.endDate) - xScale(d.startDate) - 10;
+            const label = d.label;
+
+            // Function to truncate text
+            function truncateText(text, width) {
+              text.text(label);
+              let textLength = text.node().getComputedTextLength();
+              let truncated = label;
+              while (textLength > width && truncated.length > 0) {
+                truncated = truncated.slice(0, -1);
+                text.text(truncated + '…');
+                textLength = text.node().getComputedTextLength();
+              }
+            }
+
+            truncateText(text, rectWidth);
+          });
+      });
+
+      // Create custom tooltip
       let tooltip = d3.select("body").select("#timeline-tooltip");
       if (tooltip.empty()) {
-        tooltip = d3
-          .select("body")
+        tooltip = d3.select("body")
           .append("div")
           .attr("id", "timeline-tooltip")
           .attr("class", "tooltip-custom");
       }
-      svg
-        .selectAll(".timeline-rect")
-        .data(positions)
-        .enter()
-        .append("rect")
-        .attr("class", "timeline-rect")
-        .attr("data-id", (d) => d.id)
-        .attr("x", (d) => xScale(d.startDate))
-        .attr("y", height - 70)
-        .attr("width", (d) =>
-          Math.max(5, xScale(d.endDate) - xScale(d.startDate))
-        )
-        .attr("height", 40)
-        .attr("fill", (d) => {
-          const { normal, highContrast } = getPositionColor(d.id);
-          return document.body.classList.contains("high-contrast")
-            ? highContrast
-            : normal;
-        })
-        .on("mouseenter", function (event, d) {
-          const card = document.querySelector(
-            `.position-card[data-id='${d.id}']`
-          );
-          if (card) card.classList.add("highlighted");
-          highlightSkillBubbles(d.skills);
-          highlightAccomplishments({ positions: [d.id], skills: d.skills });
+
+      // Add hover and click handlers
+      svg.selectAll(".timeline-rect")
+        .on("mouseenter", function(event, d) {
+          const card = document.querySelector(`.position-card[data-id='${d.id}']`);
+          if (card) {
+            card.classList.add("highlighted");
+            highlightSkillBubbles(d.skills);
+            highlightAccomplishments({ positions: [d.id], skills: d.skills });
+          }
           const posConfig = config.positions.find((p) => p.id === d.id);
-          const posTitle =
-            posConfig &&
-              posConfig.translations &&
-              posConfig.translations[currentLanguage]
-              ? posConfig.translations[currentLanguage].title
-              : posConfig
-                ? posConfig.title
-                : d.id;
+          const posTitle = posConfig?.translations?.[currentLanguage]?.title || posConfig?.title || d.id;
           tooltip
             .html(`Position: ${posTitle}<br>From: ${d.start}<br>To: ${d.end}`)
             .style("opacity", 1)
             .style("left", event.pageX + 10 + "px")
             .style("top", event.pageY + 10 + "px");
         })
-        .on("mousemove", function (event) {
+        .on("mousemove", function(event) {
           tooltip
             .style("left", event.pageX + 10 + "px")
             .style("top", event.pageY + 10 + "px");
         })
-        .on("mouseleave", function (event, d) {
-          const card = document.querySelector(
-            `.position-card[data-id='${d.id}']`
-          );
-          if (card) card.classList.remove("highlighted");
-          unhighlightAllSkills();
-          unhighlightAccomplishments();
+        .on("mouseleave", function(event, d) {
+          const card = document.querySelector(`.position-card[data-id='${d.id}']`);
+          if (card) {
+            card.classList.remove("highlighted");
+            unhighlightAllSkills();
+            unhighlightAccomplishments();
+          }
           tooltip.style("opacity", 0);
         })
-        .on("click", function (event, d) {
-          const card = document.querySelector(
-            `.position-card[data-id='${d.id}']`
-          );
-          if (card)
-            card.scrollIntoView({ behavior: "smooth", block: "center" });
+        .on("click", function(event, d) {
+          const card = document.querySelector(`.position-card[data-id='${d.id}']`);
+          if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
         });
+
       applyTimelineColors();
       positionRects(xScale);
     }
+
     function applyTimelineColors() {
       document.querySelectorAll(".timeline-rect").forEach((rect) => {
         const d = rect.__data__;
@@ -1875,31 +2042,18 @@
     }
     function positionRects(xScale) {
       const rects = d3.selectAll(".timeline-rect");
-      const occupied = [];
-      rects.each(function (d) {
+      const margin = { top: 50, right: 20, bottom: 30, left: 100 };
+      const timelineHeight = (document.getElementById("timeline-svg").clientHeight - margin.top - margin.bottom) / 3;
+
+      rects.each(function(d) {
         const rect = d3.select(this);
-        const x = xScale(d.startDate);
-        const width = Math.max(5, xScale(d.endDate) - xScale(d.startDate));
-        const height = 40;
-        let y = height + 0;
-        let overlapping = true;
-        while (overlapping) {
-          overlapping = false;
-          for (const occupiedRect of occupied) {
-            if (
-              x < occupiedRect.x + occupiedRect.width &&
-              x + width > occupiedRect.x &&
-              y < occupiedRect.y + occupiedRect.height &&
-              y + height > occupiedRect.y
-            ) {
-              y -= 2;
-              overlapping = true;
-              break;
-            }
-          }
-        }
+        const parent = d3.select(this.parentNode);
+        const category = parent.attr("class").split(" ")[1];
+        let categoryIndex = ["education", "work", "volunteering"].indexOf(category);
+        if (categoryIndex === -1) categoryIndex = 0;
+
+        const y = margin.top + (categoryIndex * timelineHeight) + 5;
         rect.attr("y", y);
-        occupied.push({ x, y, width, height });
       });
     }
     function highlightPositions(posIds) {
@@ -1919,7 +2073,7 @@
         .forEach((card) => card.classList.remove("dimmed", "highlighted"));
     }
     function highlightSkillBubbles(skillNames) {
-      const container = d3.select("#skill-tree-container");
+      const container = d3.select("#skill-tree-chart-container");
       container.selectAll(".skill-bubble").each(function (sd) {
         if (skillNames.includes(sd.id))
           d3.select(this).classed("hovered", true);
@@ -1927,7 +2081,7 @@
       });
     }
     function unhighlightAllSkills() {
-      const container = d3.select("#skill-tree-container");
+      const container = d3.select("#skill-tree-chart-container");
       container
         .selectAll(".skill-bubble")
         .classed("hovered", false)
@@ -2213,11 +2367,33 @@
       });
     }
 
+    function getPassphraseFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const passphrase = urlParams.get('p');
+      if (passphrase) {
+        // Remove the parameter from URL to avoid sharing
+        window.history.replaceState({}, '', window.location.pathname);
+        return decodeURIComponent(passphrase);
+      }
+      return null;
+    }
+
     function initCV() {
-      const defaultText =
-        document.getElementById("default-config").textContent;
+      const defaultText = document.getElementById("default-config").textContent;
       defaultConfig = jsyaml.load(defaultText);
       config = defaultConfig;
+
+      // Check for passphrase in URL
+      const urlPassphrase = getPassphraseFromURL();
+      if (urlPassphrase) {
+        const passInput = document.getElementById("passphrase-input");
+        passInput.value = urlPassphrase;
+        // Trigger unlock button click after a short delay
+        setTimeout(() => {
+          document.getElementById("passphrase-submit").click();
+        }, 100);
+      }
+
       if (config.page_title) document.title = config.page_title;
       if (config.cv_timestamp)
         document.getElementById("cv-timestamp").textContent =
@@ -2231,7 +2407,7 @@
       initTimeline();
       initPositionHover();
       initClipboardHandlers();
-      initButtonBounceEffect();
+      initButtonAnimations();
       initPassphraseHandler();
       showToast(defaultConfig.translations[currentLanguage].viewing_example_cv, "blue", 2000, 10000);
     }
@@ -2250,31 +2426,36 @@
     }
 
     function populatePreferences(preferences) {
-      const container = d3.select("#preferences-heatmap-container");
+      const container = d3.select("#preferences-chart-container");
       container.selectAll("*").remove();
 
       // Create container div for the visualization
       const vizContainer = container.append("div")
-        .attr("class", "preferences-viz-container");
+      .attr("class", "preferences-viz-container");
 
-      // Add view switch above the visualization
+      // Add view switch after the visualization
       const switchContainer = container.append("div")
-        .attr("id", "preferences-view-switch")
-        .attr("class", "form-check card");
+      .attr("id", "preferences-view-switch")
+      .attr("class", "form-check card p-1");
 
       switchContainer.html(`
-        <input class="form-check-input" type="checkbox" id="preferences-view-toggle">
-        <label class="form-check-label" for="preferences-view-toggle">
-          Bar Chart
-        </label>
-            `);
+      <input class="form-check-input" type="checkbox" id="preferences-view-toggle">
+      <label class="form-check-label" for="preferences-view-toggle">
+        Bar Chart View
+      </label>
+      `);
+
+      // Only add the switch in normal mode (not in high-contrast)
+      if (document.body.classList.contains("high-contrast")) {
+        switchContainer.style("display", "none");
+      }
 
       d3.select("#preferences-view-toggle").on("change", function () {
         renderPreferences(preferences, this.checked, vizContainer);
         updateTranslations();
       });
 
-      // Initial render
+      // Initial render with treemap
       renderPreferences(preferences, false, vizContainer);
       updateTranslations();
     }
@@ -2377,6 +2558,8 @@
           .attr("class", "preferences-treemap-cell")
           .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
+        let enhancedCell = null;
+
         cells.each(function (d) {
           const cell = d3.select(this);
           const backgroundColor = colorScale(d.data.level);
@@ -2387,36 +2570,32 @@
             .attr("height", d => Math.max(0, d.y1 - d.y0))
             .style("fill", backgroundColor);
 
-          cell.append("foreignObject")
-            .attr("width", d => Math.max(0, d.x1 - d.x0))
-            .attr("height", d => Math.max(0, d.y1 - d.y0))
-            .append("xhtml:div")
+          // Add text truncation for treemap cells
+          const cellWidth = d.x1 - d.x0;
+          const cellHeight = d.y1 - d.y0;
+
+          const foreignObject = cell.append("foreignObject")
+            .attr("width", cellWidth)
+            .attr("height", cellHeight);
+
+          const textDiv = foreignObject.append("xhtml:div")
             .attr("class", "preferences-text-wrapper")
             .style("color", textColor)
             .text(d.data.name);
         });
+
       }
+    }
 
-      // Update tooltip handler
-      const cells = container.selectAll(".preferences-treemap-cell, .preferences-bar-group");
-      cells.on("mouseenter", function (event, d) {
-        const tooltip = d3.select("#preferences-tooltip");
-        const name = d.data ? d.data.name : getTranslatedText(d);
+    // Consolidate button animations
+    function initButtonAnimations() {
+      const elements = document.querySelectorAll('.btn, .btn-animate, .badge');
+      elements.forEach(addButtonAnimation);
+    }
 
-        tooltip
-          .style("opacity", 1)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY + 10) + "px")
-          .html(name);
-      })
-        .on("mousemove", function (event) {
-          d3.select("#preferences-tooltip")
-            .style("left", (event.pageX + 10) + "px")
-            .style("top", (event.pageY + 10) + "px");
-        })
-        .on("mouseleave", function () {
-          d3.select("#preferences-tooltip").style("opacity", 0);
-        });
+    // Add new utility function for button animation
+    function addButtonAnimation(element) {
+      element.classList.add('btn-animate');
     }
 
     let currentLanguage = "en";
