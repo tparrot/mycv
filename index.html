@@ -1194,7 +1194,7 @@
         <!-- Certificates & Accomplishments Card -->
         <div class="card">
           <div class="card-body">
-            <h5 class="text-center">Certificates &amp; Accomplishments</h5>
+            <h5 class="text-center" data-i18n="accomplishments"></h5>
             <div id="accomplishments-list" class="mt-2"></div>
           </div>
         </div>
@@ -1222,15 +1222,25 @@
         name: "John Doe"
         title: "DevOps Engineer"
         birthplace: "New York, USA"
-        dob: "1980-01-01"
+        dob:
+          translations:
+            en: "1980-01-01"
+            de: "01.01.1980"
         phone: "+1 123-456-7890"
         email: "john.doe@example.com"
         #image: "https://img.freepik.com/fotos-kostenlos/die-rote-oder-weisse-katze-ich-auf-weissem-studio_155003-13189.jpg?semt=ais_hybrid"
-        languages: "English, German"
-        email_tooltip_en: "Click to send mail"
-        email_tooltip_de: "Mail senden"
-        phone_tooltip_en: "Click to call"
-        phone_tooltip_de: "Anrufen"
+        languages:
+          translations:
+            en: "German, English"
+            de: "Deutsch, Englisch"
+        email_tooltip:
+          translations:
+            en: "Click to send mail"
+            de: "Mail senden"
+        phone_tooltip:
+          translations:
+            en: "Click to call"
+            de: "Anrufen"
 
       positions:
         - id: "devops"
@@ -1399,13 +1409,14 @@
   <script id="translation-config" type="text/x-yaml">
       translations:
         en:
+          accomplishments: "References & Accomplishments"
           timeline: "My Timeline"
           skills: "My Mix of Skills"
           skills_legend: "Larger skill tags indicate higher expertise/experience."
           clipboard_copied: "Copied to clipboard"
           skill_filter_toast: "Showing positions with skill: {skill}"
           skill_filter_clear_toast: "Skill filter removed"
-          lang_toggle: "Deutsche Version"
+          lang_toggle: "Deutsch"
           contrast_toggle: "Accessibility Toggle"
           print: "Print"
           passphrase_submit: "Unlock"
@@ -1430,13 +1441,14 @@
           category_volunteering: "Volunteering"
           generic_error: "An error occurred: {error}"
         de:
+          accomplishments: "Referenzen & Zeugnisse"
           timeline: "Mein Lebenslauf"
           skills: "Meine Fähigkeiten"
           skills_legend: "Größere Skill-Tags deuten auf höhere Expertise/Erfahrung hin."
           clipboard_copied: "Kopiert!"
           skill_filter_toast: "Zeige Positionen mit {skill}"
           skill_filter_clear_toast: "Skillfilter entfernt"
-          lang_toggle: "English Version"
+          lang_toggle: "English"
           contrast_toggle: "Barrierefreiheit umschalten"
           print: "Drucken"
           passphrase_submit: "Öffnen"
@@ -1751,31 +1763,47 @@
       const titleEl = document.querySelector('[data-i18n="title"]');
       if (titleEl) titleEl.textContent = info.title;
       const birthEl = document.querySelector('[data-i18n="birthplace"]');
-      if (birthEl) birthEl.textContent = info.birthplace;
-      const dobEl = document.querySelector('[data-i18n="dob"]');
-      if (dobEl) dobEl.textContent = info.dob;
+      if (birthEl) {
+        // Check for translations first, fallback to simple dob if not found
+        birthEl.textContent = info.birthplace?.translations?.[currentLanguage] || info.birthplace;
+      } const dobEl = document.querySelector('[data-i18n="dob"]');
+      if (dobEl) {
+        // Check for translations first, fallback to simple dob if not found
+        dobEl.textContent = info.dob?.translations?.[currentLanguage] || info.dob;
+      }
       const phoneEl = document.querySelector('[data-i18n="phone"]');
       if (phoneEl) {
         phoneEl.textContent = info.phone;
         phoneEl.setAttribute("data-copy", info.phone);
       }
       const langEl = document.querySelector('[data-i18n="languages"]');
-      if (langEl) langEl.textContent = info.languages;
+      if (langEl) {
+        // Check for translations first, fallback to simple languages if not found
+        langEl.textContent = info.languages?.translations?.[currentLanguage] || info.languages;
+      }
       const emailElem = document.querySelector('[data-i18n="email"]');
       if (emailElem) {
         emailElem.textContent = info.email;
         emailElem.setAttribute("data-copy", info.email);
       }
       const emailLink = document.getElementById("email-link");
-      if (emailLink) emailLink.href = `mailto:"${info.name}"<${info.email}>`;
+      if (emailLink) {
+        emailLink.href = `mailto:"${info.name}"<${info.email}>`;
+        // Set tooltip from translations
+        emailLink.title = info.email_tooltip?.translations?.[currentLanguage] || info.email_tooltip;
+      }
       const phoneLink = document.getElementById("phone-link");
-      if (phoneLink)
+      if (phoneLink) {
         phoneLink.href = "tel:" + info.phone.replace(/[^0-9+]/g, "");
+        // Set tooltip from translations
+        phoneLink.title = info.phone_tooltip?.translations?.[currentLanguage] || info.phone_tooltip;
+      }
 
       const profileImageSrc = getProfileImage(info.email, info.image);
       const imgElement = document.getElementById("portrait-image");
       if (imgElement) imgElement.src = profileImageSrc;
     }
+
     function populatePositions(positions) {
       const container = document.getElementById("position-list");
       container.innerHTML = "";
@@ -2519,8 +2547,8 @@
         // Initialize event handlers
         initTimeline();
 
-                // Update translations after components are initialized
-                updateTranslations();
+        // Update translations after components are initialized
+        updateTranslations();
 
         initPositionHover();
         initClipboardHandlers();
@@ -3057,6 +3085,7 @@
     document.addEventListener("translationUpdate", () => {
 
       // Reinitialize or re-render components with the new translations
+      populatePersonalInfo(config.personal_info);
       renderPreferences(config.preferences, d3.select("#preferences-view-toggle").property("checked"));
       renderSkills(config.skills);
       populatePositions(config.positions);
