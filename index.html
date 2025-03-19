@@ -2523,7 +2523,7 @@
       populatePersonalInfo(config.personal_info);
       populatePositions(config.positions);
       populatePreferences(config.preferences);
-      renderPreferences(config.preferences);
+      renderPreferences(config.preferences, isBarChart);
       renderSkills(config.skills);
       populateAccomplishments(config.accomplishments);
 
@@ -2610,7 +2610,7 @@
       switchContainer.html(`
       <input class="form-check-input" type="checkbox" id="preferences-view-toggle">
       <label class="form-check-label" for="preferences-view-toggle">
-        Bar Chart View
+        Bar Chart
       </label>
       `);
 
@@ -2620,56 +2620,16 @@
       }
 
       d3.select("#preferences-view-toggle").on("change", function () {
-        renderPreferences(preferences, this.checked);
+        isBarChart = this.checked;
+        renderPreferences(preferences, isBarChart);
         updateTranslations();
       });
 
       // Initial render with treemap
-      renderPreferences(preferences, false);
+      renderPreferences(preferences, isBarChart);
       updateTranslations();
     }
 
-    function updatePreferences() {
-      // Update preferences visualization if it exists
-      const container = d3.select("#preferences-chart-container");
-      renderPreferences(config.preferences, d3.select("#preferences-view-toggle").property("checked"));
-    }
-
-
-
-    // Initialize preferences visualization
-    function initPreferences(preferences) {
-      const container = d3.select("#preferences-chart-container");
-      container.selectAll("*").remove();
-
-      // Create container div for the visualization
-      const vizContainer = container.append("div")
-        .attr("class", "preferences-viz-container");
-
-      // Add view switch after the visualization
-      const switchContainer = container.append("div")
-        .attr("id", "preferences-view-switch")
-        .attr("class", "form-check card p-1");
-
-      switchContainer.html(`
-        <input class="form-check-input" type="checkbox" id="preferences-view-toggle">
-        <label class="form-check-label" for="preferences-view-toggle" data-i18n="preferences_view_toggle">
-          Bar Chart View
-        </label>
-      `);
-
-      // Only add the switch in normal mode (not in high-contrast)
-      if (document.body.classList.contains("high-contrast")) {
-        switchContainer.style("display", "none");
-      }
-
-      d3.select("#preferences-view-toggle").on("change", function () {
-        renderPreferences(preferences, this.checked);
-      });
-
-      // Initial render with treemap
-      renderPreferences(preferences, false);
-    }
 
     // Render preferences visualization
     function renderPreferences(preferences, isBarChart) {
@@ -2731,14 +2691,15 @@
       if (isBarChart) {
         const margin = { top: 5, right: 5, bottom: 5, left: 5 };
         const barHeight = 30;
-        const chartHeight = barHeight * preferences.length + margin.top + margin.bottom;
+        const sortedPreferences = [...preferences].sort((a, b) => b.level - a.level); // Sort by level descending
+        const chartHeight = barHeight * sortedPreferences.length + margin.top + margin.bottom;
 
         const svg = container.append("svg")
           .attr("class", "preferences-container")
           .attr("height", chartHeight);
 
         const x = d3.scaleLinear()
-          .domain([0, d3.max(preferences, d => d.level)])
+          .domain([0, d3.max(sortedPreferences, d => d.level)])
           .range([margin.left, width - margin.right]);
 
         const colorScale = d3.scaleSequential()
@@ -2749,7 +2710,7 @@
           ));
 
         const groups = svg.selectAll("g")
-          .data(preferences)
+          .data(sortedPreferences)
           .enter()
           .append("g")
           .attr("class", "preferences-bar-group")
@@ -2855,38 +2816,6 @@
       }
     }
 
-    // Add global event listener for translation updates
-    document.addEventListener("translationUpdate", () => {
-      renderPreferences(config.preferences, d3.select("#preferences-view-toggle").property("checked"));
-      // Add other render/update functions here if needed
-    });
-
-    let currentLanguage = "en";
-    let config = null;
-    let defaultConfig = null;
-    let selectedSkill = null;
-    let disableSkillAnimation = false;
-
-    document.addEventListener("click", function (event) {
-      if (!event.target.closest(".skill-bubble") && selectedSkill !== null) {
-        selectedSkill = null;
-        d3.selectAll(".skill-bubble").classed("selected", false);
-        document.querySelectorAll(".position-card").forEach((card) => {
-          card.classList.remove("dimmed", "highlighted");
-        });
-        showToastSkillFilter("");
-      }
-    });
-    let resizeTimer;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        renderSkills(config.skills);
-        initTimeline();
-        populatePreferences(config.preferences);
-      }, 200);
-    });
-
     function initAccomplishments(accomplishments) {
       const container = d3.select("#accomplishments-list");
       container.selectAll("*").remove();
@@ -2983,7 +2912,7 @@
                 rect.bottom - containerNode.getBoundingClientRect().top
               );
             });
-            containerNode.style.height = `${maxBottom + 20}px`;
+            containerNode.style.height = `${maxBottom + 50}px`;
           }
         }, 0);
       } else {
@@ -2993,7 +2922,7 @@
           .force("charge", d3.forceManyBody().strength(-60))
           .force("x", d3.forceX(width / 2).strength(0.16))
           .force("y", d3.forceY(height / 2).strength(0.16))
-          .force("collision", d3.forceCollide().radius((d) => 20 + d.level * 4).iterations(2))
+          .force("collision", d3.forceCollide().radius((d) => 20 + d.level * 3).iterations(2))
           .on("tick", () => {
             skillBubbles
               .style("left", (d) => `${Math.max(0, Math.min(width - 130, d.x))}px`)
@@ -3001,10 +2930,10 @@
 
             let maxY = 0;
             nodes.forEach((node) => {
-              maxY = Math.max(maxY, node.y + 50);
+              maxY = Math.max(maxY, node.y + 80);
             });
             if (maxY > height) {
-              containerNode.style.height = `${maxY + 20}px`;
+              containerNode.style.height = `${maxY + 60}px`;
               height = maxY + 20;
             }
           });
@@ -3093,6 +3022,42 @@
 
       // Reinitialize or re-render components with the new translations
       updateCV()
+    });
+
+
+    let currentLanguage = "en";
+    let config = null;
+    let defaultConfig = null;
+    let selectedSkill = null;
+    let disableSkillAnimation = false;
+    let isBarChart = false;
+
+    // Add global event listener for translation updates
+    document.addEventListener("translationUpdate", () => {
+      renderPreferences(config.preferences, isBarChart);
+      // Add other render/update functions here if needed
+    });
+
+
+
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest(".skill-bubble") && selectedSkill !== null) {
+        selectedSkill = null;
+        d3.selectAll(".skill-bubble").classed("selected", false);
+        document.querySelectorAll(".position-card").forEach((card) => {
+          card.classList.remove("dimmed", "highlighted");
+        });
+        showToastSkillFilter("");
+      }
+    });
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        renderSkills(config.skills);
+        initTimeline();
+        renderPreferences(config.preferences, isBarChart);
+      }, 200);
     });
 
 
