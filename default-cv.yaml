@@ -81,25 +81,40 @@ preferences:
   - id: "homeoffice"
     level: 10
     translations:
-      en: "Homeoffice"
-      de: "Homeoffice"
+      en: "Homeoffice Option"
+      de: "Mobiles Arbeiten"
   - id: "infrastructure"
-    level: 8
+    level: 7
     translations:
-      en: "Infrastructure"
-      de: "Infrastruktur"
+      en: "Infrastructure Management"
+      de: "Infrastruktur Management"
   - id: "scrum"
     level: 5
     translations:
-      en: "Scrum"
-      de: "Scrum"
+      en: "Scrum Teams"
+      de: "Scrum Teams"
   - id: "learning"
-    level: 5
+    level: 4
     translations:
-      en: "Continous Learning"
-      de: "Weiterbildungen"
+      en: "Company Training"
+      de: "Betriebliche Weiterbildungen"
   - id: "flexible_hours"
     level: 6
     translations:
       en: "Flexible Hours"
       de: "Flexible Arbeitszeiten"
+  - id: "paas"
+    level: 4
+    translations:
+      en: "Platform as a Service"
+      de: "Platform as a Service"
+  - id: "linux"
+    level: 7
+    translations:
+      en: "Working with Linux"
+      de: "Arbeiten mit Linux"
+  - id: "bereitschaftsdienst"
+    level: 8
+    translations:
+      en: "No On-Call Duty"
+      de: "Kein Bereitschaftsdienst"
