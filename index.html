@@ -834,6 +834,19 @@
       transform: scale(0.95);
     }
 
+    .print aside {
+        width: 60mm !important;
+        float: left !important;
+        margin: 0 !important;
+        padding-right: 1rem !important;
+        overflow: visible !important;
+    }
+
+    .print .preferences-container {
+      width: 55mm !important;
+      overflow: hidden !important;
+    }
+
     /* Print Styles */
     @media print {
       @page {
@@ -871,7 +884,7 @@
       }
 
       aside {
-        width: 40% !important;
+        width: 70mm !important;
         float: left !important;
         margin: 0 !important;
         padding-right: 1rem !important;
@@ -879,7 +892,7 @@
       }
 
       main {
-        width: 60% !important;
+        width: 130mm !important;
         float: right !important;
         margin: 0 !important;
         padding-left: 1rem !important;
@@ -894,7 +907,6 @@
         min-height: 30vh !important;
         /* Set a minimum height */
         overflow: visible !important;
-        margin: 0 auto !important;
         /* Center align */
       }
 
@@ -913,6 +925,7 @@
         overflow: visible !important;
         page-break-inside: avoid !important;
       }
+
 
       .preferences-treemap,
       .preferences-bar-chart {
@@ -1065,6 +1078,7 @@
     body.high-contrast #preferences-view-switch label {
       color: var(--hc-text);
     }
+
 
     /* Update preferences styles */
     .preferences-treemap rect {
@@ -3118,6 +3132,19 @@
         initTimeline();
         renderPreferences(config.preferences, isBarChart);
       }, 200);
+    });
+
+    window.addEventListener('beforeprint', () => {
+      let asideContainer = document.querySelector("aside");
+      asideContainer.classList.add("print");
+      renderSkills(config.skills);
+      renderPreferences(config.preferences, isBarChart);
+    });
+    window.addEventListener('afterprint', () => {
+      let asideContainer = document.querySelector("aside");
+      asideContainer.classList.remove("print");
+      renderSkills(config.skills);
+      renderPreferences(config.preferences, isBarChart);
     });
 
 
