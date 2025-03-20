@@ -123,6 +123,35 @@ echo "Encrypted configuration saved to encrypted-config.json"
 
 Translations are defined in the `<script id="translation-config">` tag. You can add or modify translations for additional languages.
 
+## Cryptographic Technique
+
+This project uses **AES-256-CBC** for encrypting and decrypting sensitive data such as YAML configurations and images. The encryption process involves the following steps:
+
+1. A passphrase is used to derive a cryptographic key using PBKDF2 with SHA-256 and 100,000 iterations.
+2. A random salt and initialization vector (IV) are generated for each encryption operation.
+3. The data is encrypted using AES-256-CBC with the derived key, salt, and IV.
+4. The encrypted data, along with the salt and IV, is encoded in Base64 and stored in a JSON structure.
+
+### JSON Structure for Encrypted Data
+
+The encrypted data is stored in the following JSON format:
+
+```json
+{
+  "salt": "Base64-encoded salt",
+  "iv": "Base64-encoded initialization vector",
+  "ciphertext": "Base64-encoded encrypted data"
+}
+```
+
+### Example Usage
+
+To encrypt a YAML configuration or an image, ensure the data is encoded in the above JSON format. The decryption process will use the same passphrase to derive the key and decrypt the data.
+
+### Decrypting Images
+
+If an encrypted image is supplied, it will be decrypted during the passphrase submission process and displayed in the profile section.
+
 ## Development
 
 ### File Structure
