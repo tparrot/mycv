@@ -2668,7 +2668,7 @@
         .attr("class", "form-check card p-1");
 
       switchContainer.html(`
-      <input class="form-check-input" type="checkbox" id="preferences-view-toggle">
+      <input class="form-check-input" type="checkbox" id="preferences-view-toggle" checked/>
       <label class="form-check-label" for="preferences-view-toggle">
         Bar Chart
       </label>
@@ -3090,7 +3090,7 @@
     let defaultConfig = null;
     let selectedSkill = null;
     let disableSkillAnimation = false;
-    let isBarChart = false;
+    let isBarChart = true;
 
     // Add global event listener for translation updates
     document.addEventListener("translationUpdate", () => {
