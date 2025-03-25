@@ -687,7 +687,7 @@
       z-index: 90;
       /*box-shadow: 0 4px 4px -2px rgba(0,0,0,0.3);
       background: var(--color-bg);*/
-      overflow: show;
+      overflow: visible;
     }
 
     #timeline-svg {
@@ -842,10 +842,10 @@
         overflow: visible !important;
     }
 
-    .print .preferences-container {
+    /*.print .preferences-container {
       width: 55mm !important;
       overflow: hidden !important;
-    }
+    }*/
 
     /* Print Styles */
     @media print {
@@ -937,6 +937,15 @@
         left: -3rem !important;
       }
 
+      .preferences-viz-container svg {
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      #preferences-chart-container {
+        page-break-inside: avoid;
+      }
+
       /* Prevent unwanted breaks */
       .position-card,
       .card,
@@ -946,10 +955,18 @@
         margin-bottom: 1rem !important;
       }
 
+      .timeline-category {
+        font-size: 10px !important;
+      }
+
+      #timeline-svg {
+        left: -50px !important;
+      }
+
       /* Hide interactive elements */
       .top-buttons,
       #preferences-view-switch,
-      #timeline-card,
+      #timeline-tooltip,
       #generic-toast,
       .toast,
       .clipboard-btn,
@@ -1161,7 +1178,7 @@
       /*padding: 0.5rem;*/
       font-size: 0.875rem;
       line-height: 1.2;
-      overflow: show;
+      overflow: visible;
       overflow-wrap: anywhere !important;
       word-wrap: break-word;
     }
@@ -1981,7 +1998,7 @@
       return dateStr.includes("-") ? parseDate(dateStr) : parseYear(dateStr);
     }
 
-    function initTimeline() {
+    function initTimeline(maxWidth) {
       const positions = Array.from(document.querySelectorAll(".position-card"))
         .reverse()
         .map((card) => {
@@ -2015,7 +2032,7 @@
       const extendedMinDate = d3.timeMonth.offset(minDate, -12);
       const extendedMaxDate = d3.timeMonth.offset(maxDate, 12);
       const svgEl = document.getElementById("timeline-svg");
-      const width = svgEl.clientWidth;
+      const width = maxWidth || svgEl.clientWidth;
       const height = svgEl.clientHeight;
       const svg = d3.select(svgEl);
       svg.selectAll("*").remove();
@@ -2706,10 +2723,10 @@
 
 
     // Render preferences visualization
-    function renderPreferences(preferences, isBarChart) {
+    function renderPreferences(preferences, isBarChart, maxWidth) {
       const container = d3.select(".preferences-viz-container");
       container.selectAll("*").remove();
-      const width = container.node().clientWidth;
+      const width = maxWidth || container.node().clientWidth;
       const height = width * 1;
 
       // Helper function to get translated text
@@ -3138,12 +3155,14 @@
       let asideContainer = document.querySelector("aside");
       asideContainer.classList.add("print");
       renderSkills(config.skills);
-      renderPreferences(config.preferences, isBarChart);
+      initTimeline(520);
+      renderPreferences(config.preferences, isBarChart, 210);
     });
     window.addEventListener('afterprint', () => {
       let asideContainer = document.querySelector("aside");
       asideContainer.classList.remove("print");
       renderSkills(config.skills);
+      initTimeline();
       renderPreferences(config.preferences, isBarChart);
     });
 
