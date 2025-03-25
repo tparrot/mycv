@@ -3147,6 +3147,7 @@
       resizeTimer = setTimeout(() => {
         renderSkills(config.skills);
         initTimeline();
+        updateTranslations();
         renderPreferences(config.preferences, isBarChart);
       }, 200);
     });
@@ -3156,6 +3157,7 @@
       asideContainer.classList.add("print");
       renderSkills(config.skills);
       initTimeline(520);
+      updateTranslations();
       renderPreferences(config.preferences, isBarChart, 210);
     });
     window.addEventListener('afterprint', () => {
@@ -3163,6 +3165,7 @@
       asideContainer.classList.remove("print");
       renderSkills(config.skills);
       initTimeline();
+      updateTranslations();
       renderPreferences(config.preferences, isBarChart);
     });
 
