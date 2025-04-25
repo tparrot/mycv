@@ -1993,9 +1993,8 @@
     }
 
     function toDate(dateStr) {
-      const parseDate = d3.timeParse("%Y-%m");
-      const parseYear = d3.timeParse("%Y");
-      return dateStr.includes("-") ? parseDate(dateStr) : parseYear(dateStr);
+      const parseDate = d3.timeParse("%Y-%m-%d") || d3.timeParse("%Y-%m") || d3.timeParse("%Y");
+      return parseDate;
     }
 
     function initTimeline(maxWidth) {
