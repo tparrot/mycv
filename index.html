@@ -1993,8 +1993,11 @@
     }
 
     function toDate(dateStr) {
-      const parseDate = d3.timeParse("%Y-%m-%d") || d3.timeParse("%Y-%m") || d3.timeParse("%Y");
-      return parseDate;
+      const parsedDateDay = d3.timeParse("%Y-%m-%d");
+      const parsedDateMonth = d3.timeParse("%Y-%m");
+      const parsedDateYear = d3.timeParse("%Y");
+      const coalesce = (...args) => args.find(_ => ![undefined, null].includes(_));
+      return coalesce(parsedDateDay, parsedDateMonth, parsedDateYear);
     }
 
     function initTimeline(maxWidth) {
