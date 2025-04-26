@@ -640,6 +640,10 @@
       position: relative;
     }
 
+    #skill-tree-legend {
+      float: left;
+    }
+
     /* Skill Tree */
     #skill-tree-chart-container {
       position: relative;
@@ -1818,7 +1822,6 @@
     function toggleContrast() {
       document.body.classList.toggle("high-contrast");
       updateColors();
-      renderSkills(config.skills);
     }
     function populatePersonalInfo(info) {
       const nameEl = document.querySelector('[data-i18n="name"]');
