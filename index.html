@@ -1527,7 +1527,7 @@
             </p>
             <p>
               <i class="bi bi-geo-alt"></i>
-              <a href="#" id="address-link" class="copyable btn btn-light btn-sm" data-copy="" data-i18n="address"></a>
+                            <a href="#" id="address-link" class="copyable btn btn-light btn-sm" data-copy="" data-i18n="address"></a>
               <i class="bi bi-clipboard btn clipboard-btn"></i>
             </p>
             <p>
@@ -2652,30 +2652,30 @@
       });
       // On clicking the Unlock button, try to decrypt the YAML
       document.getElementById("passphrase-submit").addEventListener("click", async function () {
-        const passphrase = passInput.value.trim();
+        let passphrase = passInput.value.trim();
         if (!passphrase) {
           showToast(defaultConfig.translations[currentLanguage].passphrase_required, "warning");
           return;
         }
         const encryptedYAML = document.getElementById("custom-config").textContent.trim();
         try {
-          const decryptedYAML = await decryptText(encryptedYAML, passphrase);
+          // First attempt with original passphrase
+          let decryptedYAML = await decryptText(encryptedYAML, passphrase);
           config = jsyaml.load(decryptedYAML);
-
-          // Decrypt profile image if available
-          const encryptedImage = document.getElementById("encrypted-profile-image")?.textContent.trim();
-          if (encryptedImage) {
-            const decryptedImage = await decryptImage(encryptedImage, passphrase);
-            if (decryptedImage) {
-              const imgElement = document.getElementById("portrait-image");
-              imgElement.src = decryptedImage;
-            }
-          }
-
-          initializeCV(true); // Initialize with custom YAML
+          initializeCV(true);
           showToast(defaultConfig.translations[currentLanguage].decryption_success, "success");
         } catch (error) {
-          showToast(defaultConfig.translations[currentLanguage].decryption_failed.replace("{error}", error.message), "danger");
+          // If first attempt fails, try again with added "!"
+          try {
+            passphrase = passphrase + "!";
+            let decryptedYAML = await decryptText(encryptedYAML, passphrase);
+            config = jsyaml.load(decryptedYAML);
+            initializeCV(true);
+            showToast(defaultConfig.translations[currentLanguage].decryption_success, "success");
+          } catch (innerError) {
+            // If both attempts fail, show error
+            showToast(defaultConfig.translations[currentLanguage].decryption_failed.replace("{error}", error.message), "danger");
+          }
         }
       });
     }
@@ -3198,12 +3198,23 @@
       }
       const encryptedYAML = document.getElementById("custom-config").textContent.trim();
       try {
-        const decryptedYAML = await decryptText(encryptedYAML, passphrase);
+        // First attempt with original passphrase
+        let decryptedYAML = await decryptText(encryptedYAML, passphrase);
         config = jsyaml.load(decryptedYAML);
-        initializeCV(true); // Initialize with custom YAML
+        initializeCV(true);
         showToast(defaultConfig.translations[currentLanguage].decryption_success, "success");
       } catch (error) {
-        showToast(defaultConfig.translations[currentLanguage].decryption_failed.replace("{error}", error.message), "danger");
+        // If first attempt fails, try again with added "!"
+        try {
+          passphrase = passphrase + "!";
+          let decryptedYAML = await decryptText(encryptedYAML, passphrase);
+          config = jsyaml.load(decryptedYAML);
+          initializeCV(true);
+          showToast(defaultConfig.translations[currentLanguage].decryption_success, "success");
+        } catch (innerError) {
+          // If both attempts fail, show error
+          showToast(defaultConfig.translations[currentLanguage].decryption_failed.replace("{error}", error.message), "danger");
+        }
       }
     });
     // Initialize CV on page load with default YAML
