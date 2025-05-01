@@ -289,7 +289,9 @@
       education_performance: "Educational Performance"
       work_performance: "Work Performance"
       technical_skills: "Technical Skills"
+      technical_skills_card: "Technical Skills Aquired"
       social_skills: "Social Skills"
+      social_skills_card: "Social Skills Earned"
       lang_toggle: "Deutsch"
       contrast_toggle: "High Contrast"
       print: "Print"
@@ -319,10 +321,12 @@
       timeline: "Mein Lebenslauf"
       skills: "Meine Fähigkeiten"
       skill_position_title: "Gewonne Fähigkeiten"
-      education_performance: "Schulleistungen"
+      education_performance: "Schulische Leistungen"
       work_performance: "Arbeitsleistungen"
       technical_skills: "Technische Fähigkeiten"
+      technical_skills_card: "Technische Fähigkeiten erlernt"
       social_skills: "Soziale Kompetenzen"
+      social_skills_card: "Soziale Kompetenzen gewonnen"
       clipboard_copied: "Kopiert!"
       skill_filter_toast: "Zeige Positionen mit {skill}"
       skill_filter_clear_toast: "Skillfilter entfernt"
@@ -760,7 +764,7 @@
 
     #timeline-svg-container {
       width: 100%;
-      height: 25vh;
+      height: 100%;
       position: sticky;
       top: 0;
       z-index: 90;
@@ -817,10 +821,13 @@
       font-size: 16px;
     }
 
+    body.high-contrast #timeline-card {
+      height: 275px;
+    }
+
     /* Accomplishments */
     .accomplishment-item.has-attachment {
       padding: 0;
-      margin-bottom: 0.5rem;
     }
 
     .accomplishment-item.has-attachment .btn-accomplishment {
@@ -929,7 +936,7 @@
       }
 
       aside {
-        width: 72mm !important;
+        width: 82mm !important;
         float: left !important;
         margin: 0 !important;
         padding-right: 1rem !important;
@@ -937,7 +944,7 @@
       }
 
       main {
-        width: 130mm !important;
+        width: 120mm !important;
         float: right !important;
         margin: 0 !important;
         padding-left: 1rem !important;
@@ -1263,7 +1270,7 @@
             <p class="card-text" data-i18n="title"></p>
             <p>
               <i class="bi bi-cake2"></i>
-              <span data-i18n="dob"></span>@<span data-i18n="birthplace"></span>
+              <span data-i18n="dob"></span> (<span data-i18n="birthplace"></span>)
             </p>
             <p>
               <i class="bi bi-geo-alt"></i>
@@ -1311,7 +1318,7 @@
       </aside>
       <!-- RIGHT COLUMN: Timeline & Positions -->
       <main class="col-md-8" style="overflow-y: auto; min-height: calc(100vh - 60px)">
-        <div id="timeline-card" class="mb-2">
+        <div id="timeline-card" class="mb-2" style="height: 230px;">
           <h5 class="text-center" data-i18n="timeline"></h5>
           <div id="timeline-svg-container">
             <svg id="timeline-svg"></svg>
@@ -1394,7 +1401,7 @@
     function renderContent(content) {
       if (typeof content === "string") {
         const p = document.createElement("p");
-        p.className = "m-0 p-0 text-wrap";
+        p.className = "m-0 px-3 text-wrap";
         p.innerHTML = content.replace(/\n/g, "<br>");
         return p;
       }
@@ -1415,14 +1422,14 @@
           return p;
         } else if (content.type === "paragraph") {
           const p = document.createElement("p");
-          p.className = "mx-3 text-wrap";
+          p.className = "mx-3 mb-0 text-wrap";
           p.innerHTML = content.text
             ? content.text.replace(/\n/g, "<br>")
             : "";
           return p;
         } else if (content.type === "list") {
           const ul = document.createElement("ul");
-          ul.className = "mx-0";
+          ul.className = "mx-0 mb-0";
           if (Array.isArray(content.items)) {
             content.items.forEach((item) => {
               const li = document.createElement("li");
@@ -1434,6 +1441,7 @@
           return ul;
         } else {
           const p = document.createElement("p");
+          p.className = "mx-3 text-wrap";
           p.innerHTML = content.text
             ? content.text.replace(/\n/g, "<br>")
             : "";
@@ -1705,7 +1713,7 @@
         // Header + toggle
         card.innerHTML = `
           <div class="d-flex justify-content-between align-items-start">
-            <div class="p-3">
+            <div class="pt-2 px-3 pb-1">
               <h5 class="card-title mb-1 position-headline">${title}</h5>
               ${companyHTML}
               <h7 class="card-subtitle mb-2 text-muted date">
@@ -1714,7 +1722,7 @@
               </h7>
             </div>
             <button
-              class="btn btn-m btn-outline-secondary ms-2 m-3"
+              class="btn btn-m btn-outline-secondary m-2"
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#desc-${pos.id}"
@@ -1728,7 +1736,7 @@
         // Description panel
         const desc = document.createElement("div");
         desc.id = `desc-${pos.id}`;
-        desc.classList.add("collapse", "position-description", "card-text", "pe-3");
+        desc.classList.add("collapse", "position-description", "pe-3");
         if (pos.id === defaultOpenId) desc.classList.add("show");
         if (t.description || pos.description) {
           desc.appendChild(renderContent(t.description || pos.description));
@@ -1745,13 +1753,13 @@
           lists.classList.add("position-skills-lists", "me-3", "w-100", "ps-3");
           lists.innerHTML = `
             ${techList.length ? `
-              <div class="h6" data-i18n="technical_skills"></div>
+              <div class="h6 mt-2" data-i18n="technical_skills_card"></div>
               <div class="d-inline-flex flex-wrap mb-2">
                 ${techList.map(s => `<div class="mx-1 fs-6"><span class="badge rounded-pill bg-primary">${skillMap[s].translations?.[currentLanguage]?.title || s}</div>`).join("")}
               </div>
             ` : ''}
             ${socialList.length ? `
-              <div class="h6" data-i18n="social_skills"></div>
+              <div class="h6 mt-2" data-i18n="social_skills_card"></div>
               <div class="d-inline-flex flex-wrap mb-2">
                 ${socialList.map(s => `<div class="mx-1 fs-6"><span class="badge rounded-pill bg-success">${skillMap[s].translations?.[currentLanguage]?.title || s}</div>`).join("")}
               </div>
@@ -2075,7 +2083,7 @@
 
       accomplishments.forEach((ac) => {
         const item = document.createElement("li");
-        item.classList.add("accomplishment-item", "list-group-item");
+        item.classList.add("accomplishment-item", "list-group-item", "p-0");
         item.setAttribute("data-positions", ac.positions.join(","));
         item.dataset.acc = JSON.stringify(ac);
 
@@ -2086,7 +2094,7 @@
           const btn = document.createElement("a");
           btn.href = ac.attachment;
           btn.target = "_blank";
-          btn.classList.add("btn", "btn-accomplishment", "pb-2", "px-2", "m-1");
+          btn.classList.add("btn", "btn-accomplishment");
           btn.innerHTML = `
             <span>${labelText}</span>
             <i class="bi bi-paperclip"></i>
@@ -2543,7 +2551,7 @@
         schoolHeader.className = 'text-center p-2';
         schoolList = document.createElement('ul');
         schoolList.id = 'school-education-list';
-        schoolList.className = 'list-group-flush p-3';
+        schoolList.className = 'list-group list-group-flush';
         // Insert before Technical Skills card
         const techCard = document.querySelector('[data-i18n="technical_skills"]').closest('.card');
         const containerDiv = document.createElement('div');
@@ -2572,7 +2580,7 @@
         if (grad.grade) {
           content += (content ? ' (' : '') + grad.grade + ')';
         }
-        li.innerHTML = `<p class="text-wrap w-75" style="float:inline-start">${label}:</p> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
         schoolList.appendChild(li);
       }
       if (high.exams) {
@@ -2580,7 +2588,7 @@
         const label = exams.translations?.[currentLanguage] || exams.translations?.['de'] || exams.translations?.['en'];
         const li = document.createElement('li');
         li.className = 'list-group-item';
-        li.innerHTML = `<p class="text-wrap w-75" style="float:inline-start">${label}:</p> <span class="text-center w-25" style="float:inline-end">${exams.value}</span>`;
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${exams.value}</span>`;
         schoolList.appendChild(li);
       }
       // High school entries (years)
@@ -2591,7 +2599,7 @@
         const label = high.years[year].translations?.[currentLanguage] || high.years[year];
         const li = document.createElement('li');
         li.className = 'list-group-item';
-        li.innerHTML = `<p class="text-wrap w-75" style="float:inline-start">${label}:</p> <span class="text-center w-25" style="float:inline-end">${grade}</span>`;
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${grade}</span>`;
         schoolList.appendChild(li);
       });
             // Secondary school graduation
@@ -2600,14 +2608,14 @@
         const label = grad.translations?.[currentLanguage] || grad.translations?.['de'] || grad.translations?.['en'];
         const li = document.createElement('li');
         li.className = 'list-group-item';
-        li.innerHTML = `<p class="text-wrap w-75" style="float:inline-start">${label}:</p> <span class="text-center w-25" style="float:inline-end">${grad.grade || ''}</span>`;
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${grad.grade || ''}</span>`;
         schoolList.appendChild(li);
       }
     }
 
     function populateWorkMilestones(workObj) {
       if (!workObj) return;
-      const aside = document.querySelector('aside.col-md-4');
+      const aside = document.querySelector('aside');
       let workHeader = document.getElementById('work-milestones-header');
       let workList = document.getElementById('work-milestones-list');
       if (!workHeader) {
@@ -2616,7 +2624,7 @@
         workHeader.className = 'text-center p-2';
         workList = document.createElement('ul');
         workList.id = 'work-milestones-list';
-        workList.className = 'list-group-flush p-3';
+        workList.className = 'list-group list-group-flush';
         // Find technical skills card again (we may have appended school sections already)
         const techCard = document.querySelector('[data-i18n="technical_skills"]').closest('.card');
         // Insert work header and list right after school list
@@ -2653,7 +2661,7 @@
         } else {
           if (entry.grade) content = entry.grade;
         }
-        li.innerHTML = `<p class="text-wrap w-75" style="float:inline-start">${title}:</p> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${title}:</span> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
         workList.appendChild(li);
       });
     }
