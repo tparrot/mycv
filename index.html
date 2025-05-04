@@ -775,6 +775,10 @@
     li.list-group-item.work-milestones-list-item {
       border-left: 6px solid #ccc;
     }
+    #school-education-list,
+    #work-milestones-list {
+      border-top: unset;
+    }
 
     /* Timeline */
     img,
@@ -2669,13 +2673,11 @@
         workList.id = 'work-milestones-list';
         workList.className = 'list-group list-group-flush';
         const techCard = document.querySelector('[data-i18n="technical_skills"]').closest('.card');
-        const containerDiv = techCard.previousElementSibling || document.createElement('div');
-        if (!containerDiv.id) {
-          containerDiv.className = 'mb-3 card';
-          aside.insertBefore(containerDiv, techCard);
-        }
+        const containerDiv = document.createElement('div');
+        containerDiv.className = 'mb-3 card';
         containerDiv.appendChild(workHeader);
         containerDiv.appendChild(workList);
+        aside.insertBefore(containerDiv, techCard);
       } else {
         workList.innerHTML = '';
       }
