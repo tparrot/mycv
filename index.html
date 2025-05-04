@@ -422,13 +422,15 @@
       /* Rich purple */
       --highlight-12: #A52FFF;
       /* Deep purple */
+
     }
 
     body {
       margin: 0;
       background: var(--color-bg);
       color: var(--color-text);
-      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-family: "Verdana", "Helvetica Neue", Arial, sans-serif;
+      font-size: 9pt;
     }
 
     /* High Contrast Mode */
@@ -479,7 +481,7 @@
     }
 
     body.high-contrast #timeline-svg .tick {
-      font-size: 2.5vw !important;
+      font-size: 2rem !important;
     }
 
     body.high-contrast .timeline-rect {
@@ -542,6 +544,10 @@
       color: var(--hc-highlight) !important;
       border-radius: 50%;
       outline: 2px solid var(--hc-border) !important;
+    }
+
+    .btn {
+      font-size: 9pt;
     }
 
     /* Top Bar: Default layout */
@@ -665,7 +671,7 @@
     #phone-link,
     #email-link,
     #address-link {
-      max-width: 65%;
+      max-width: 85%;
       word-break: break-all;
       white-space: pre-line;
     }
@@ -684,6 +690,15 @@
     .position-headline {
       /* leave space for collapse button */
       margin-right: 40px;
+    }
+
+    .position-company,
+    .position-date {
+      font-size: 9pt !important;
+    }
+
+    .position-skill-badge {
+      font-size: 7pt;
     }
 
     .position-badges {
@@ -740,7 +755,7 @@
       text-align: center;
       transition: opacity 0.2s, transform 0.2s;
       user-select: none;
-      font-size: 14px;
+      font-size: 9pt;
       max-width: -webkit-fill-available;
     }
 
@@ -794,9 +809,8 @@
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
-      pointer-events: none;
       font-family: sans-serif;
-      font-size: 9px;
+      font-size: 9pt;
       fill: var(--color-text);
       max-width: calc(100% - 10px);
       /* Ensure text doesn't overflow its container */
@@ -804,7 +818,7 @@
 
     .timeline-category {
       font-family: sans-serif;
-      font-size: 12px;
+      font-size: 11pt;
       font-weight: bold;
       fill: var(--color-text);
     }
@@ -817,7 +831,7 @@
     body.high-contrast .timeline-label,
     body.high-contrast .timeline-category {
       fill: var(--hc-text);
-      font-size: 16px;
+      font-size: 1.4rem;
     }
 
     body.high-contrast #timeline-card {
@@ -910,7 +924,7 @@
       body {
         width: 210mm;
         height: 297mm;
-        font-size: 11pt;
+        font-size: 9pt;
         margin: 0;
         padding: 0;
         -webkit-print-color-adjust: exact;
@@ -936,7 +950,8 @@
       }
 
       aside {
-        width: 82mm !important;
+        font-size: 7pt;
+        width: 77mm !important;
         float: left !important;
         margin: 0 !important;
         padding-right: 1rem !important;
@@ -944,7 +959,7 @@
       }
 
       main {
-        width: 120mm !important;
+        width: 125mm !important;
         float: right !important;
         margin: 0 !important;
         padding-left: 1rem !important;
@@ -966,13 +981,13 @@
       .position-card,
       .card,
       .accomplishment-item {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
+        /*page-break-inside: avoid !important;
+        break-inside: avoid !important;*/
         margin-bottom: 1rem !important;
       }
 
       .timeline-category {
-        font-size: 10px !important;
+        font-size: 8pt !important;
       }
 
       #timeline-svg {
@@ -1005,6 +1020,36 @@
       background: var(--hc-bg);
       color: var(--hc-text);
       border: 2px solid var(--hc-border);
+    }
+
+
+    /* 1) Base style: no scrolling until hovered */
+    .timeline-label {
+      display: inline-block;
+      white-space: nowrap;
+      /* pause the animation by default */
+      animation: scroll-text 5s linear infinite paused;
+      will-change: transform;
+    }
+
+    /* 2) On hover, run the animation */
+    .timeline-rect-group:hover .timeline-label {
+      animation-play-state: running;
+    }
+
+    /* 3) keyframes: move left (to reveal overflow) then back */
+    @keyframes scroll-text {
+      0% {
+        transform: translateX(0);
+      }
+
+      50% {
+        transform: translateX(calc(-100% + var(--clip-width)));
+      }
+
+      100% {
+        transform: translateX(0);
+      }
     }
 
     /* Add these styles in the style section */
@@ -1106,7 +1151,7 @@
       color: white;
       padding: 8px;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 9pt;
       z-index: 1000;
       transition: opacity 0.2s;
     }
@@ -1685,7 +1730,7 @@
 
       positions.forEach((pos) => {
         const card = document.createElement("div");
-        card.classList.add("card", "position-card");
+        card.classList.add("card", "position-card", "pb-2");
         card.setAttribute("data-id", pos.id);
         card.setAttribute("data-start", pos.start);
         card.setAttribute("data-end", pos.end);
@@ -1715,12 +1760,12 @@
         card.innerHTML = `
           <div class="d-flex justify-content-between align-items-start">
             <div class="pt-2 px-3 pb-1">
-              <h5 class="card-title mb-1 position-headline">${title}</h5>
+              <h5 class="card-title mb-1 position-headline">${title}</span>
               ${companyHTML}
-              <h7 class="card-subtitle mb-2 text-muted date">
+              <h6 class="card-subtitle text-muted position-date">
                 <span class="start-date">${pos.start}</span> –
                 <span class="end-date">${pos.end}</span>
-              </h7>
+              </h6>
             </div>
             <button
               class="btn btn-m btn-outline-secondary m-2"
@@ -1754,15 +1799,15 @@
           lists.classList.add("position-skills-lists", "me-3", "w-100", "ps-3");
           lists.innerHTML = `
             ${techList.length ? `
-              <div class="h6 mt-2" data-i18n="technical_skills_card"></div>
-              <div class="d-inline-flex flex-wrap mb-2">
-                ${techList.map(s => `<div class="mx-1 fs-6"><span class="badge rounded-pill bg-primary">${skillMap[s].translations?.[currentLanguage]?.title || s}</div>`).join("")}
+              <h7 class="position-skill-header mt-2 w-100" data-i18n="technical_skills_card"></h7>
+              <div class="d-inline-flex flex-wrap w-100">
+                ${techList.map(s => `<div class="mx-1 fs-6"><span class="position-skill-badge badge rounded-pill bg-primary">${skillMap[s].translations?.[currentLanguage]?.title || s}</div>`).join("")}
               </div>
             ` : ''}
             ${socialList.length ? `
-              <div class="h6 mt-2" data-i18n="social_skills_card"></div>
-              <div class="d-inline-flex flex-wrap mb-2">
-                ${socialList.map(s => `<div class="mx-1 fs-6"><span class="badge rounded-pill bg-success">${skillMap[s].translations?.[currentLanguage]?.title || s}</div>`).join("")}
+              <h7 class="position-skill-header mt-2 w-100" data-i18n="social_skills_card"></h7>
+              <div class="d-inline-flex flex-wrap w-100">
+                ${socialList.map(s => `<div class="mx-1 fs-6"><span class="position-skill-badge badge rounded-pill bg-success">${skillMap[s].translations?.[currentLanguage]?.title || s}</div>`).join("")}
               </div>
             ` : ''}
           `;
@@ -1797,18 +1842,16 @@
     }
 
     function initTimeline(maxWidth) {
+      // 1) Collect and normalize data
       const positions = Array.from(document.querySelectorAll(".position-card"))
         .reverse()
-        .map((card) => {
+        .map(card => {
           const pid = card.getAttribute("data-id");
-          const pos = config.positions.find(p => p.id === pid);
-          const category = card.getAttribute("data-category");
+          const pos = config.positions.find(p => p.id === pid) || {};
           const startStr = card.getAttribute("data-start");
           const endStr = card.getAttribute("data-end");
           const skills = (card.getAttribute("data-skills") || "")
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean);
+            .split(",").map(s => s.trim()).filter(Boolean);
           return {
             id: pid,
             start: startStr,
@@ -1816,19 +1859,19 @@
             skills,
             startDate: toDate(startStr),
             endDate: toDate(endStr),
-            category: pos.category || 'work',
-            label: pos.translations?.[currentLanguage]?.title_short || pos.title_short || pid
+            category: pos.category || "work",
+            label: (pos.translations?.[currentLanguage]?.title_short)
+              || pos.title_short || pid
           };
         });
-
       if (!positions.length) return;
 
-      // Derive categories from positions
-      const categories = [...new Set(positions.map(p => p.category))].sort();
-      const minDate = d3.min(positions, (d) => d.startDate);
-      const maxDate = d3.max(positions, (d) => d.endDate);
-      const extendedMinDate = d3.timeMonth.offset(minDate, -2);
-      const extendedMaxDate = d3.timeMonth.offset(maxDate, 2);
+      // 2) Setup SVG, scales, axes, categories
+      const categories = [...new Set(positions.map(d => d.category))].sort();
+      const minDate = d3.min(positions, d => d.startDate);
+      const maxDate = d3.max(positions, d => d.endDate);
+      const extendedMin = d3.timeMonth.offset(minDate, -2);
+      const extendedMax = d3.timeMonth.offset(maxDate, 2);
       const svgEl = document.getElementById("timeline-svg");
       const width = maxWidth || svgEl.clientWidth;
       const height = svgEl.clientHeight;
@@ -1836,60 +1879,57 @@
       svg.selectAll("*").remove();
 
       const margin = { top: 50, right: 20, bottom: 30, left: 100 };
-      const timelineHeight = (height - margin.top - margin.bottom) / categories.length;
-
+      const laneH = (height - margin.top - margin.bottom) / categories.length;
       const xScale = d3.scaleTime()
-        .domain([extendedMinDate, extendedMaxDate])
+        .domain([extendedMin, extendedMax])
         .range([margin.left, width - margin.right]);
 
-      // Add category labels
+      // 3) Add <defs> for clipPaths
+      const defs = svg.append("defs");
+
+      // 4) Category labels
       svg.selectAll(".timeline-category")
-        .data(categories)
-        .enter()
+        .data(categories).enter()
         .append("text")
         .attr("class", "timeline-category")
         .attr("x", margin.left - 10)
-        .attr("y", (d, i) => margin.top + (i * timelineHeight) + (timelineHeight / 2))
+        .attr("y", (d, i) => margin.top + i * laneH + laneH / 2)
         .attr("text-anchor", "end")
         .attr("dominant-baseline", "middle")
         .text(d => d.charAt(0).toUpperCase() + d.slice(1))
-        .attr("data-i18n", d => `category_${d}`);  // Add data-i18n attribute
+        .attr("data-i18n", d => `category_${d}`);
 
-      // Add time axis with grid lines every 5 years
+      // 5) Time axis
       const xAxis = d3.axisBottom(xScale)
         .ticks(d3.timeYear.every(5))
         .tickSize(-height + margin.top + margin.bottom);
-
-      const xAxisGroup = svg.append("g")
+      svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", `translate(0,${height - margin.bottom})`);
-
-      xAxisGroup.call(xAxis)
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(xAxis)
         .selectAll(".tick line")
         .attr("stroke", "#ddd")
         .attr("stroke-dasharray", "2,2");
+      svg.selectAll(".domain").attr("stroke", "#999");
 
-      xAxisGroup.selectAll(".domain")
-        .attr("stroke", "#999");
+      // 6) Draw lanes
+      categories.forEach((cat, ci) => {
+        const laneY = margin.top + ci * laneH;
+        const data = positions.filter(d => d.category === cat);
 
-      // Create timeline items for each category
-      categories.forEach((category, categoryIndex) => {
-        const categoryPositions = positions.filter(p => p.category === category);
-
-
-        const timelineItems = svg.selectAll(`.timeline-rect-${category}`)
-          .data(categoryPositions)
-          .enter()
+        const group = svg.selectAll(`.lane-${cat}`)
+          .data(data).enter()
           .append("g")
-          .attr("class", `timeline-rect-group ${category}`);
+          .attr("class", `timeline-rect-group ${cat}`);
 
-        timelineItems.append("rect")
+        // 6a) Bars
+        group.append("rect")
           .attr("class", "timeline-rect")
           .attr("data-id", d => d.id)
           .attr("x", d => xScale(d.startDate))
-          .attr("y", margin.top + (categoryIndex * timelineHeight) + 5)
+          .attr("y", laneY + 5)
           .attr("width", d => Math.max(5, xScale(d.endDate) - xScale(d.startDate)))
-          .attr("height", timelineHeight - 10)
+          .attr("height", laneH - 10)
           .attr("fill", d => {
             const { normal, highContrast } = getPositionColor(d.id);
             return document.body.classList.contains("high-contrast")
@@ -1897,34 +1937,55 @@
               : normal;
           });
 
-        timelineItems.append("text")
+        // 6b) ClipPaths & Labels
+        group.append("text")
           .attr("class", "timeline-label")
-          .attr("x", d => xScale(d.startDate) + 5)
-          .attr("y", margin.top + (categoryIndex * timelineHeight) + (timelineHeight / 2))
-          .attr("dominant-baseline", "middle")
           .each(function (d) {
-            const text = d3.select(this);
-            // Create a clip path for this text
+            const txt = d3.select(this);
+            const startX = xScale(d.startDate) + 5;
+            const clipW = Math.max(5, xScale(d.endDate) - xScale(d.startDate)) - 10;
             const clipId = `clip-${d.id}`;
-            const rectWidth = xScale(d.endDate) - xScale(d.startDate) - 10;
 
-            const svg = d3.select(this.ownerSVGElement);
-            svg.append("clipPath")
+            // define one clipPath per ID
+            defs.append("clipPath")
               .attr("id", clipId)
               .append("rect")
-              .attr("x", xScale(d.startDate) + 5)
-              .attr("y", margin.top + (categoryIndex * timelineHeight))
-              .attr("width", rectWidth)
-              .attr("height", timelineHeight);
+              .attr("x", startX)
+              .attr("y", laneY)
+              .attr("width", clipW)
+              .attr("height", laneH);
 
-            // Apply the clip path and set the text
-            text
+            // position text
+            txt
+              .attr("x", startX)
+              .attr("y", laneY + laneH / 2)
+              .attr("dominant-baseline", "middle")
               .attr("clip-path", `url(#${clipId})`)
               .text(d.label);
+
+            // hover‐scroll
+            const node = txt.node();
+            const origX = startX;
+            function animate() {
+              const fullW = node.getComputedTextLength();
+              const overflow = fullW - clipW;
+              if (overflow <= 0) return;
+              txt.transition()
+                .duration(overflow * 50).ease(d3.easeLinear)
+                .attr("x", origX - overflow)
+                .transition()
+                .duration(overflow * 15).ease(d3.easeLinear)
+                .attr("x", origX)
+                .on("end", animate);
+            }
+            txt.on("mouseover", animate)
+             .on("mouseout", () => {
+                txt.interrupt().attr("x", origX);
+              });
           });
       });
 
-      // Create custom tooltip
+      // 7) Tooltip & interactions (unchanged)
       let tooltip = d3.select("body").select("#timeline-tooltip");
       if (tooltip.empty()) {
         tooltip = d3.select("body")
@@ -1932,43 +1993,29 @@
           .attr("id", "timeline-tooltip")
           .attr("class", "tooltip-custom");
       }
-
-      // Add hover and click handlers
       svg.selectAll(".timeline-rect")
-        .on("mouseenter", function (event, d) {
+        .on("mouseenter", (event, d) => {
           const card = document.querySelector(`.position-card[data-id='${d.id}']`);
-          if (card) {
-            card.classList.add("highlighted");
-            highlightSkillBubbles(d.skills);
-          }
-          const posConfig = config.positions.find((p) => p.id === d.id);
-          const posTitle = posConfig?.translations?.[currentLanguage]?.title || posConfig?.title || d.id;
-
-          // Use defaultConfig for translations when showing default content
-          const translations = (config?.translations || defaultConfig.translations)[currentLanguage];
-
-          tooltip
-            .html(`${translations.timeline_position}: ${posTitle}<br>` +
-              `${translations.timeline_from}: ${d.start}<br>` +
-              `${translations.timeline_to}: ${d.end}`)
+          if (card) { card.classList.add("highlighted"); highlightSkillBubbles(d.skills); }
+          const p = config.positions.find(p => p.id === d.id) || {};
+          const title = p.translations?.[currentLanguage]?.title || p.title || d.id;
+          const t = (config.translations || defaultConfig.translations)[currentLanguage];
+          tooltip.html(`${t.timeline_position}: ${title}<br>`
+            + `${t.timeline_from}: ${d.start}<br>`
+            + `${t.timeline_to}: ${d.end}`)
             .style("opacity", 1)
             .style("left", event.pageX + 10 + "px")
             .style("top", event.pageY + 10 + "px");
         })
-        .on("mousemove", function (event) {
-          tooltip
-            .style("left", event.pageX + 10 + "px")
-            .style("top", event.pageY + 10 + "px");
-        })
-        .on("mouseleave", function (event, d) {
+        .on("mousemove", e => tooltip
+          .style("left", e.pageX + 10 + "px")
+          .style("top", e.pageY + 10 + "px"))
+        .on("mouseleave", (e, d) => {
           const card = document.querySelector(`.position-card[data-id='${d.id}']`);
-          if (card) {
-            card.classList.remove("highlighted");
-            unhighlightAllSkills();
-          }
+          if (card) { card.classList.remove("highlighted"); unhighlightAllSkills(); }
           tooltip.style("opacity", 0);
         })
-        .on("click", function (event, d) {
+        .on("click", (e, d) => {
           const card = document.querySelector(`.position-card[data-id='${d.id}']`);
           if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
         });
@@ -1976,6 +2023,7 @@
       applyTimelineColors();
       positionRects(xScale);
     }
+
 
     function applyTimelineColors() {
       document.querySelectorAll(".timeline-rect").forEach((rect) => {
@@ -2603,8 +2651,8 @@
         li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${grade}</span>`;
         schoolList.appendChild(li);
       });
-            // Secondary school graduation
-            if (schoolObj.secondary_school?.graduation) {
+      // Secondary school graduation
+      if (schoolObj.secondary_school?.graduation) {
         const grad = schoolObj.secondary_school.graduation;
         const label = grad.translations?.[currentLanguage] || grad.translations?.['de'] || grad.translations?.['en'];
         const li = document.createElement('li');
@@ -2760,7 +2808,7 @@
       let asideContainer = document.querySelector("aside");
       asideContainer.classList.add("print");
       updateCV()
-      initTimeline(550);
+      initTimeline(570);
     });
     window.addEventListener('afterprint', () => {
       let asideContainer = document.querySelector("aside");
