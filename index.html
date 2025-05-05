@@ -1766,6 +1766,7 @@
                 <span class="end-date">${pos.end}</span>
               </h6>
             </div>
+            ${(t.description || pos.description) ? `
             <button
               class="btn btn-m btn-outline-secondary m-2"
               type="button"
@@ -1775,6 +1776,7 @@
               aria-controls="desc-${pos.id}">
               <i class="bi bi-arrows-angle-${pos.id === defaultOpenId ? "contract" : "expand"}"></i>
             </button>
+            ` : ''}
           </div>
         `;
 
