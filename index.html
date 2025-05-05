@@ -2628,7 +2628,7 @@
         li.className = 'list-group-item school-education-list-item';
         let content = grad.value || '';
         if (grad.grade) {
-          content += (content ? ' (' : '') + grad.grade + ')';
+          content += (grad.value ? ' (' : '') + grad.grade + (grad.value ? ')' : '');
         }
         li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
         if (highPos) {
@@ -2643,7 +2643,11 @@
         const label = exams.translations?.[currentLanguage] || exams.translations?.['de'] || exams.translations?.['en'];
         const li = document.createElement('li');
         li.className = 'list-group-item school-education-list-item';
-        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${exams.value}</span>`;
+        let content = exams.value || '';
+        if (exams.grade) {
+          content += (exams.value ? ' (' : '') + exams.grade + (exams.value ? ')' : '');
+        }
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
         if (highPos) {
           const { normal, highContrast } = getPositionColor(highPos);
           li.style.borderLeft = '6px solid ' + (document.body.classList.contains('high-contrast') ? highContrast : normal);
@@ -2653,11 +2657,16 @@
       // High school year grades
       const yearKeys = Object.keys(high.years || {});
       yearKeys.forEach(year => {
-        const grade = high.years[year].grade;
+        const grade = high.years[year].grade || '';
+        const value = high.years[year].value || '';
         const label = high.years[year].translations?.[currentLanguage] || high.years[year];
         const li = document.createElement('li');
         li.className = 'list-group-item school-education-list-item';
-        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${grade}</span>`;
+        let content = value || '';
+        if (grade) {
+          content += (value ? ' (' : '') + grade + (value ? ')' : '');
+        }
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
         if (highPos) {
           const { normal, highContrast } = getPositionColor(highPos);
           li.style.borderLeft = '6px solid ' + (document.body.classList.contains('high-contrast') ? highContrast : normal);
@@ -2670,7 +2679,11 @@
         const label = grad.translations?.[currentLanguage] || grad.translations?.['de'] || grad.translations?.['en'];
         const li = document.createElement('li');
         li.className = 'list-group-item school-education-list-item';
-        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${grad.grade || ''}</span>`;
+        let content = grad.value || '';
+        if (grad.grade) {
+          content += (grad.value ? ' (' : '') + grad.grade + (grad.value ? ')' : '');
+        }
+        li.innerHTML = `<span class="text-wrap w-75" style="float:inline-start">${label}:</span> <span class="text-center w-25" style="float:inline-end">${content}</span>`;
         const secPos = schoolObj.secondary_school.position;
         if (secPos) {
           const { normal, highContrast } = getPositionColor(secPos);
