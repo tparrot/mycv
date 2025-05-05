@@ -701,6 +701,20 @@
       font-size: 7pt;
     }
 
+    .position-skills-list {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+
+    .position-content-li>p {
+      display: inline;
+      padding: 0 !important;
+    }
+
+    .position-content-ul {
+      list-style-position: outside;
+    }
+
     .position-badges {
       /* leave space for category badge */
       margin-right: 55px;
@@ -944,7 +958,7 @@
       li.accomplishment-list-item span,
       li.school-education-list-item,
       li.work-milestones-list-item {
-        font-size: 7pt !important;
+        font-size: 8pt !important;
       }
 
       /* Force widest Bootstrap scaling for print */
@@ -1112,7 +1126,7 @@
     }
 
     /* Button tooltip */
-    .btn[data-full-text]:hover::after {
+    .btn[data-full-text]:hover:after {
       content: attr(data-full-text);
       position: absolute;
       bottom: 100%;
@@ -1445,25 +1459,25 @@
       if (typeof content === "object" && content !== null) {
         if (content.type === "lead") {
           const p = document.createElement("p");
-          p.className = "mx-3";
+          p.className = "mx-3 mb-1";
           p.innerHTML = content.text
             ? content.text.replace(/\n/g, "<br>")
             : "";
           return p;
         } else if (content.type === "paragraph") {
           const p = document.createElement("p");
-          p.className = "mx-3 mb-0 text-wrap";
+          p.className = "mx-3 mb-1 text-wrap";
           p.innerHTML = content.text
             ? content.text.replace(/\n/g, "<br>")
             : "";
           return p;
         } else if (content.type === "list") {
           const ul = document.createElement("ul");
-          ul.className = "mx-0 mb-0";
+          ul.className = "me-2 mb-1 m-0 position-content-ul";
           if (Array.isArray(content.items)) {
             content.items.forEach((item) => {
               const li = document.createElement("li");
-              li.className = "";
+              li.className = "position-content-li";
               li.appendChild(renderContent(item));
               ul.appendChild(li);
             });
@@ -1781,10 +1795,10 @@
           const socialList = pos.skills.filter(id => skillMap[id]?.type === "social");
 
           const lists = document.createElement("div");
-          lists.classList.add("position-skills-lists", "me-3", "w-100", "ps-3", "row");
+          lists.classList.add("position-skills-list", "me-3", "w-100", "ps-3", "row");
           lists.innerHTML = `
             ${techList.length ? `
-              <div class="col card m-1 p-1 px-2">
+              <div class="col card m-1 p-1 px-2 me-3">
               <h7 class="position-skill-header" data-i18n="technical_skills_card"></h7>
               <div class="d-inline-flex flex-wrap w-100">
                 ${techList.map(s => `<span class="m-1 position-skill-badge badge rounded-pill bg-primary">${skillMap[s].translations?.[currentLanguage]?.title || s}</span>`).join("")}
@@ -1792,7 +1806,7 @@
               </div>
             ` : ''}
             ${socialList.length ? `
-              <div class="col card m-1 p-1 px-2">
+              <div class="col card m-1 p-1 px-2 me-3">
               <h7 class="position-skill-header" data-i18n="social_skills_card"></h7>
               <div class="d-inline-flex flex-wrap w-100">
                 ${socialList.map(s => `<span class="m-1 position-skill-badge badge rounded-pill bg-success">${skillMap[s].translations?.[currentLanguage]?.title || s}</span>`).join("")}
